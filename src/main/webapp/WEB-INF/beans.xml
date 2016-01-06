@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://xmlns.jcp.org/xml/ns/javaee">
 
+  <scan>
+    <!-- These exclusions were added by Errai to avoid deploying client-side classes to the server -->
+    <exclude name = "org.jboss.errai.demo.client.local.ContactEditor" />
+    <exclude name = "org.jboss.errai.demo.client.local.ContactPresenter" />
+    <exclude name = "org.jboss.errai.demo.client.local.ContactDisplay" />
+    <exclude name = "org.jboss.errai.demo.client.local.ContactList" />
+    <!-- End of Errai exclusions -->
+  </scan>
 </beans>

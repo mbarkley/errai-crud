@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="../../../../../../../webapp/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../../webapp/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" type="text/css" href="contact-page.css">
+    <script src="../../../../../../../webapp/bootstrap/js/bootstrap.js"></script>
+  </head>
+  <body>
+    <div id="contact-list" class="container">
+      <div class="modal">
+        <div class="modal-content">
+          <input class="nickname" type="text" placeholder="Nickname">
+          <input class="fullname" type="text" placeholder="Full Name">
+          <input class="phonenumber" type="tel" placeholder="1 234 567 8910">
+          <input class="email" type="email" placeholder="email@domain.tld">
+          <input class="birthday" type="date" placeholder="2016-01-01">
+        </div>
+        <button class="modal-button">Submit</button>
+      </div>
+      <table class="container">
+        <thead>
+          <tr>
+            <th>Nickname</th>
+            <th>Fullname</th>
+            <th>Phonenumber</th>
+            <th>Email</th>
+            <th>Birthday</th>
+          </tr>
+        </thead>
+        <tbody data-field="list">
+          <tr class="contact">
+            <td class="nickname">Nickname</td>
+            <td class="fullname">Full Name</td>
+            <td class="phonenumber">1 234 567 8910</td>
+            <td class="email">email@domain.tld</td>
+            <td class="birthday">2016-01-01</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="container">
+        <button class="new-contact">New Contact</button>
+      </div>
+    </div>
+  </body>
+</html>

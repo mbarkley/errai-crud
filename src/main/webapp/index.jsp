@@ -19,10 +19,7 @@
 <link rel="shortcut icon" href="<%=contextPath%>/favicon.ico">
 <link rel="apple-touch-icon" href="<%=contextPath%>/favicon.ico">
 
-<link rel="apple-touch-icon" sizes="72x72" href="<%=contextPath%>/images/apple-touch-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="114x114" href="<%=contextPath%>/images/apple-touch-icon-114x114.png">
-
-<script type="text/javascript" language="javascript" src="<%=contextPath%>/app/app.nocache.js"></script>
+<script type="text/javascript" src="<%=contextPath%>/app/app.nocache.js"></script>
 </head>
 
 <body>

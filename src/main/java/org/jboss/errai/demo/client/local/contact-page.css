@@ -1,0 +1,24 @@
+thead {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.contact input:read-only {
+  background-color: inherit;
+  border: 0;
+  border-style: none;
+  border-radius: 0;
+}
+
+.contact input, .modal-content input {
+  height: 35px;
+}
+
+#contact-list {
+  position: relative;
+}
+
+.modal {
+  position: absolute;
+  display: none;
+}
