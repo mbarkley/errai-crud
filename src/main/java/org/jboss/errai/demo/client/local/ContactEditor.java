@@ -53,7 +53,7 @@ public class ContactEditor extends ContactPresenter {
   private InputElement email;
 
   @Inject
-  @Bound @DataField
+  @Bound(converter = DateConverter.class) @DataField
   private InputElement birthday;
 
   public DivElement getRootElement() {

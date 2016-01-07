@@ -24,6 +24,10 @@ td {
   padding: 5px 30px 5px;
 }
 
+tr.selected {
+  background-color: rgba(100, 100, 100, 0.6);
+}
+
 .contact input:read-only {
   background-color: inherit;
   border: 0;

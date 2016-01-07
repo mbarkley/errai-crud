@@ -30,14 +30,22 @@ public class DateConverter implements Converter<Date, String> {
 
   @Override
   public Date toModelValue(final String widgetValue) {
-    final Double numericDate = JsDate.parse(widgetValue);
-    return new Date(numericDate.longValue());
+    final JsDate jsDate = JsDate.create(widgetValue);
+    return new Date((long) jsDate.getTime());
   }
 
   @Override
   public String toWidgetValue(final Date modelValue) {
-    final JsDate jsDate = JsDate.create(((Long) modelValue.getTime()).doubleValue());
-    return jsDate.toDateString();
+    if (modelValue == null) {
+      return "";
+    } else {
+      final JsDate jsDate = JsDate.create(((Long) modelValue.getTime()).doubleValue());
+      return toISODate(jsDate);
+    }
   }
+
+  private static native String toISODate(final JsDate date) /*-{
+    return date.toISOString().substring(0, 10);
+  }-*/;
 
 }

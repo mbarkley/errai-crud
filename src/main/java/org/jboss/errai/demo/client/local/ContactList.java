@@ -16,8 +16,12 @@
 
 package org.jboss.errai.demo.client.local;
 
+import java.util.List;
+
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.jboss.errai.databinding.client.api.AbstractBindableListChangeHandler;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.client.widget.ListWidget;
 import org.jboss.errai.ui.client.widget.Table;
@@ -30,6 +34,10 @@ import org.jboss.errai.ui.shared.api.annotations.Templated;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Display;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.user.client.Event;
 
 /**
@@ -39,6 +47,8 @@ import com.google.gwt.user.client.Event;
 @Page(role = DefaultPage.class)
 @Templated(value = "contact-page.html#contact-list", stylesheet = "contact-page.css")
 public class ContactList {
+
+  private ContactDisplay lastSelected;
 
   @Inject
   @DataField
@@ -52,18 +62,71 @@ public class ContactList {
   @DataField
   private ListWidget<Contact, ContactDisplay> list;
 
+  @PostConstruct
+  private void setup() {
+    list.addBindableListChangeHandler(new AbstractBindableListChangeHandler<Contact>() {
+      @Override
+      public void onItemAdded(final List<Contact> source, final Contact item) {
+        final ContactDisplay component = list.getComponent(item);
+        final SelectionHandler handler = new SelectionHandler(component);
+        component.addClickHandler(handler);
+        component.addDoubleClickHandler(handler);
+      }
+    });
+  }
+
   @SinkNative(Event.ONCLICK)
   @EventHandler("new-contact")
   private void onNewContactClick(final Event event) {
+    displayModal();
+  }
+
+  private void displayModal() {
     modal.getStyle().setDisplay(Display.BLOCK);
+  }
+
+  private void editModel(final Contact model) {
+    editor.setModel(model);
+    displayModal();
   }
 
   @SinkNative(Event.ONCLICK)
   @EventHandler("modal-button")
   private void onModalSubmitClick(final Event event) {
     modal.getStyle().clearDisplay();
-    list.getValue().add(editor.getModel());
+    if (!list.getValue().contains(editor.getModel())) {
+      list.getValue().add(editor.getModel());
+    }
     editor.setModel(new Contact());
+  }
+
+  private class SelectionHandler implements ClickHandler, DoubleClickHandler {
+
+    private final ContactDisplay component;
+
+    private SelectionHandler(final ContactDisplay component) {
+      this.component = component;
+    }
+
+    @Override
+    public void onClick(final ClickEvent event) {
+      selectComponent();
+    }
+
+    private void selectComponent() {
+      if (lastSelected != null) {
+        lastSelected.setSelected(false);
+      }
+      component.setSelected(true);
+      lastSelected = component;
+    }
+
+    @Override
+    public void onDoubleClick(final DoubleClickEvent event) {
+      selectComponent();
+      editModel(component.getModel());
+    }
+
   }
 
 }
