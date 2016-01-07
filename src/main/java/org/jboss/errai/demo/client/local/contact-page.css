@@ -1,6 +1,27 @@
+.table-container {
+  margin: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+
+table {
+  text-align: left;
+  margin: 0 auto 20px;
+}
+
 thead {
   font-weight: bold;
   font-size: 1.5em;
+}
+
+th {
+  padding: 10px 30px 10px;
+}
+
+td {
+  padding: 5px 30px 5px;
 }
 
 .contact input:read-only {
@@ -16,9 +37,29 @@ thead {
 
 #contact-list {
   position: relative;
+  text-align: center;
 }
 
 .modal {
   position: absolute;
   display: none;
+}
+
+.new-contact {
+  margin: auto;
+  height: 60px;
+  width: 60px;
+  border-radius: 60px;
+  padding: 0;
+  border: 1px solid white;
+  background-color: rgba(255, 255, 255, 0.8);
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 50pt;
+  color: rgb(40, 40, 40);
+  outline-width: 0;
+}
+
+.new-contact:active {
+  background-color: rgba(255, 255, 255, 1);
 }

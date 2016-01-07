@@ -49,7 +49,7 @@ public class ContactDisplay extends ContactPresenter {
   private TableCellElement email;
 
   @Inject @Named("td")
-  @Bound @DataField
+  @Bound(converter = DateConverter.class) @DataField
   private TableCellElement birthday;
 
 }
