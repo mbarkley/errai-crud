@@ -69,6 +69,10 @@ public class ContactDisplay extends ContactPresenter {
   @Bound(converter = DateConverter.class) @DataField
   private TableCellElement birthday;
 
+  @Inject @Named("td")
+  @Bound @DataField
+  private TableCellElement notes;
+
   public HandlerRegistration addClickHandler(final ClickHandler handler) {
     clickHandlers.add(handler);
 

@@ -37,6 +37,8 @@ public class Contact {
 
   private Date birthday;
 
+  private String notes;
+
   public Date getBirthday() {
     return birthday;
   }
@@ -75,6 +77,14 @@ public class Contact {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
   }
 
 }

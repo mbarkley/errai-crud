@@ -24,6 +24,7 @@ import org.jboss.errai.ui.shared.api.annotations.Templated;
 
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.InputElement;
+import com.google.gwt.dom.client.TextAreaElement;
 
 /**
  *
@@ -51,6 +52,10 @@ public class ContactEditor extends ContactPresenter {
   @Inject
   @Bound @DataField
   private InputElement email;
+
+  @Inject
+  @Bound @DataField
+  private TextAreaElement notes;
 
   @Inject
   @Bound(converter = DateConverter.class) @DataField
