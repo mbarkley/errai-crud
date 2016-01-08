@@ -31,7 +31,7 @@ public class ContactPresenter implements HasModel<Contact> {
 
   @Inject
   @AutoBound
-  private DataBinder<Contact> binder;
+  protected DataBinder<Contact> binder;
 
   public ContactPresenter() {
     super();

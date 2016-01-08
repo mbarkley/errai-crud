@@ -30,6 +30,10 @@ public class DateConverter implements Converter<Date, String> {
 
   @Override
   public Date toModelValue(final String widgetValue) {
+    if (widgetValue == null || widgetValue.equals("")) {
+      return null;
+    }
+
     final JsDate jsDate = JsDate.create(widgetValue);
     return new Date((long) jsDate.getTime());
   }

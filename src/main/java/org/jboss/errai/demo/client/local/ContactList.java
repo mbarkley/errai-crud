@@ -32,6 +32,7 @@ import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.SinkNative;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 
+import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -58,6 +59,10 @@ public class ContactList {
   @DataField("modal-content")
   private ContactEditor editor;
 
+  @Inject
+  @DataField("modal-delete")
+  private ButtonElement delete;
+
   @Inject @Table(root = "tbody")
   @DataField
   private ListWidget<Contact, ContactDisplay> list;
@@ -78,26 +83,57 @@ public class ContactList {
   @SinkNative(Event.ONCLICK)
   @EventHandler("new-contact")
   private void onNewContactClick(final Event event) {
-    displayModal();
+    displayModal(false);
   }
 
-  private void displayModal() {
+  private void displayModal(final boolean withDelete) {
+    if (withDelete) {
+      delete.getStyle().clearDisplay();
+    } else {
+      delete.getStyle().setDisplay(Display.NONE);
+    }
     modal.getStyle().setDisplay(Display.BLOCK);
   }
 
   private void editModel(final Contact model) {
-    editor.setModel(model);
-    displayModal();
+    editor.copyModelState(model);
+    displayModal(true);
   }
 
   @SinkNative(Event.ONCLICK)
-  @EventHandler("modal-button")
+  @EventHandler("modal-submit")
   private void onModalSubmitClick(final Event event) {
-    modal.getStyle().clearDisplay();
-    if (!list.getValue().contains(editor.getModel())) {
+    hideModal();
+    if (editor.isCopied()) {
+      editor.overwriteCopiedModelState();
+    }
+    else {
       list.getValue().add(editor.getModel());
     }
     editor.setModel(new Contact());
+  }
+
+  private void hideModal() {
+    modal.getStyle().clearDisplay();
+  }
+
+  @SinkNative(Event.ONCLICK)
+  @EventHandler("modal-cancel")
+  private void onModalCancelClick(final Event event) {
+    hideModal();
+    editor.setModel(new Contact());
+  }
+
+  @EventHandler("modal-delete")
+  private void onModalDeleteClick(final ClickEvent event) {
+    if (editor.isCopied()) {
+      if (lastSelected != null && lastSelected.getModel() == editor.getCopied()) {
+        lastSelected = null;
+      }
+      list.getValue().remove(editor.getCopied());
+      editor.setModel(new Contact());
+      hideModal();
+    }
   }
 
   private class SelectionHandler implements ClickHandler, DoubleClickHandler {
@@ -114,7 +150,7 @@ public class ContactList {
     }
 
     private void selectComponent() {
-      if (lastSelected != null) {
+      if (lastSelected != null && lastSelected != component) {
         lastSelected.setSelected(false);
       }
       component.setSelected(true);

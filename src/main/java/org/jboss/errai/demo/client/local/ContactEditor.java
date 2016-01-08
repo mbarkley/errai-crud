@@ -18,6 +18,8 @@ package org.jboss.errai.demo.client.local;
 
 import javax.inject.Inject;
 
+import org.jboss.errai.databinding.client.api.InitialState;
+import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
@@ -32,6 +34,8 @@ import com.google.gwt.dom.client.TextAreaElement;
  */
 @Templated(value = "contact-page.html#modal-content", stylesheet = "contact-page.css")
 public class ContactEditor extends ContactPresenter {
+
+  private Contact copied;
 
   @Inject
   @DataField("modal-content")
@@ -63,6 +67,35 @@ public class ContactEditor extends ContactPresenter {
 
   public DivElement getRootElement() {
     return root;
+  }
+
+  @Override
+  public void setModel(Contact model) {
+    copied = null;
+    super.setModel(model);
+  }
+
+  public void copyModelState(final Contact model) {
+    final Contact originalModel = getModel();
+    binder.setModel(model, InitialState.FROM_MODEL);
+    binder.setModel(originalModel, InitialState.FROM_UI);
+    copied = model;
+  }
+
+  public boolean isCopied() {
+    return copied != null;
+  }
+
+  public void overwriteCopiedModelState() {
+    if (isCopied()) {
+      final Contact workingModel = getModel();
+      binder.setModel(copied, InitialState.FROM_UI);
+      binder.setModel(workingModel);
+    }
+  }
+
+  public Contact getCopied() {
+    return copied;
   }
 
 }
