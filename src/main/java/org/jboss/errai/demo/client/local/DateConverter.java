@@ -18,11 +18,16 @@ package org.jboss.errai.demo.client.local;
 
 import java.util.Date;
 
+import org.jboss.errai.databinding.client.api.Bindable;
 import org.jboss.errai.databinding.client.api.Converter;
 
 import com.google.gwt.core.client.JsDate;
+import com.google.gwt.dom.client.InputElement;
 
 /**
+ * Converts between {@link Date} instances used in {@link Bindable} models, and {@link String Strings} used in
+ * {@link InputElement} values. Uses Javascript's native {@code Date} object for conversion so that the date
+ * {@link String Strings} are properly displayed in input elements with the type "date".
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */

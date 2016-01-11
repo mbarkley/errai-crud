@@ -16,10 +16,16 @@
 
 package org.jboss.errai.demo.client.shared;
 
+import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.annotations.MapsTo;
 import org.jboss.errai.common.client.api.annotations.Portable;
 
 /**
+ * This {@link Portable} type is fired as a CDI event from the server so that clients can observe created and updated
+ * {@link Contact Contacts} from different browser sessions without refreshing.
+ * <p>
+ * This type encapulates a session id as well as a {@link Contact} so that the client that orginally created or updated
+ * a {@link Contact} can ignore the event.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
@@ -35,10 +41,16 @@ public class ContactOperation {
     this.sourceQueueSessionId = sourceQueueSessionId;
   }
 
+  /**
+   * A {@link Contact} that has been created or updated.
+   */
   public Contact getContact() {
     return contact;
   }
 
+  /**
+   * The value of {@link ClientMessageBus#getSessionId()} from the browser session from which the event is caused.
+   */
   public String getSourceQueueSessionId() {
     return sourceQueueSessionId;
   }

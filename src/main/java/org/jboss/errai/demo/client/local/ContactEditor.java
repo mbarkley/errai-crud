@@ -29,6 +29,28 @@ import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.dom.client.TextAreaElement;
 
 /**
+ * <p>
+ * An Errai UI component for creating and editing a single {@link Contact}. This component can be bound to a
+ * {@link Contact} by calling {@link #setModel(Contact)}. It can also copy the state of a {@link Contact} without
+ * binding to it (and then later overwrite the state of the copied {@link Contact}).
+ *
+ * <p>
+ * The HTML markup for this {@link Templated} component is the HTML element with the CSS class {@code modal-content} in
+ * the file {@code contact-page.html} in this package. This component uses CSS from the file {@code contact-page.css} in
+ * this package.
+ *
+ * <p>
+ * The {@link DataField} annotation marks fields that replace HTML elements from the template file. As an example, the
+ * field {@link ContactDisplay#root} is the root {@code <div>} element of this component; it can be used to attach this
+ * component to the DOM.
+ *
+ * <p>
+ * The {@link Bound} annotations mark UI fields with values that Errai Data-Binding keeps synchronized with properties
+ * in the bound {@link Contact} model instance. (See the base class, {@link ContactPresenter}.)
+ *
+ * <p>
+ * Instances of this type should be obtained via Errai IoC, either by using {@link Inject} in another container managed
+ * bean, or by programmatic lookup through the bean manager.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
@@ -37,6 +59,11 @@ public class ContactEditor extends ContactPresenter {
 
   private Contact copied;
 
+  /**
+   * The {@link DataField} annotation for this field declares that this {@link DivElement} is the element from the
+   * template file with the CSS class {@code modal-content}. Because of the fragment {@code #modal-content} in the
+   * {@link Templated#value()} on this class, this is the root element of this template.
+   */
   @Inject
   @DataField("modal-content")
   private DivElement root;
@@ -61,6 +88,9 @@ public class ContactEditor extends ContactPresenter {
   @Bound @DataField
   private TextAreaElement notes;
 
+  /*
+   * We specify a converter because Errai does not provide built-in conversion from String to Date.
+   */
   @Inject
   @Bound(converter = DateConverter.class) @DataField
   private InputElement birthday;
@@ -75,6 +105,11 @@ public class ContactEditor extends ContactPresenter {
     super.setModel(model);
   }
 
+  /**
+   * Copies the state of the given model, but does not remain bound to this model after the method returns. This
+   * {@link ContactEditor} retains an instance to the copied model so that it's state can be overwritten with subsequent
+   * calls to {@link #overwriteCopiedModelState()}.
+   */
   public void copyModelState(final Contact model) {
     final Contact originalModel = getModel();
     binder.setModel(model, InitialState.FROM_MODEL);
@@ -82,10 +117,18 @@ public class ContactEditor extends ContactPresenter {
     copied = model;
   }
 
+  /**
+   * True if no calls to {@link #setModel(Contact)} have happened since the last call to
+   * {@link #copyModelState(Contact)}.
+   */
   public boolean isCopied() {
     return copied != null;
   }
 
+  /**
+   * If {@link #isCopied()} is true, overwrite the state of the model returned by {@link #getCopied()} with the state of
+   * the model returned by {@link #getModel()}.
+   */
   public void overwriteCopiedModelState() {
     if (isCopied()) {
       final Contact workingModel = getModel();
@@ -94,6 +137,11 @@ public class ContactEditor extends ContactPresenter {
     }
   }
 
+  /**
+   * @return If no calls to {@link #setModel(Contact)} have happened since the last call to
+   *         {@link #copyModelState(Contact)}, return the parameter of the last call to {@link #copyModelState(Contact)}
+   *         . Otherwise return <code>null</code>.
+   */
   public Contact getCopied() {
     return copied;
   }

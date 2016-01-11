@@ -16,16 +16,20 @@
 
 package org.jboss.errai.demo.client.shared;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Qualifier;
 
 /**
+ * Qualifier for {@link ContactOperation} to differentiate the creation of new {@link Contact Contacts} from the
+ * updating of existing ones.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
 @Qualifier
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Created {
 

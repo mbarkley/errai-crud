@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 /**
+ * Defines a JaxRS HTTP service for performing CRUD operations on {@link Contact Contacts}.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */

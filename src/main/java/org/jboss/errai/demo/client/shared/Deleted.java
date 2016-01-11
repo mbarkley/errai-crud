@@ -16,16 +16,20 @@
 
 package org.jboss.errai.demo.client.shared;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import javax.enterprise.event.Event;
 import javax.inject.Qualifier;
 
 /**
+ * A qualifier for observing id values fired as CDI {@link Event Events} for deleted {@link Contact Contacts}.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
 @Qualifier
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Deleted {
 

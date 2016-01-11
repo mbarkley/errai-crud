@@ -32,6 +32,9 @@ import org.jboss.errai.demo.client.shared.Deleted;
 import org.jboss.errai.demo.client.shared.Updated;
 
 /**
+ * Server-side implementation for the RPC service, {@link ContactStorageService}. Performs database CRUD operations
+ * using the {@link ContactEntityService} and fires Errai CDI {@link Event Events} that are observed by clients over the
+ * wire to publish creation, update, and deletion of {@link Contact Contacts}.
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
@@ -61,6 +64,7 @@ public class ContactStorageServiceImpl implements ContactStorageService {
   @Override
   public Response create(final ContactOperation contactOperation) {
     entityService.create(contactOperation.getContact());
+    // This event is delivered to call connected clients.
     created.fire(contactOperation);
 
     return Response.created(UriBuilder.fromResource(ContactStorageService.class)
@@ -70,6 +74,7 @@ public class ContactStorageServiceImpl implements ContactStorageService {
   @Override
   public Response update(final ContactOperation contactOperation) {
     entityService.update(contactOperation.getContact());
+    // This event is delivered to call connected clients.
     updated.fire(contactOperation);
 
     return Response.noContent().build();
@@ -78,6 +83,7 @@ public class ContactStorageServiceImpl implements ContactStorageService {
   @Override
   public Response delete(Long id) {
     entityService.delete(id);
+    // This event is delivered to call connected clients.
     deleted.fire(id);
 
     return Response.noContent().build();
