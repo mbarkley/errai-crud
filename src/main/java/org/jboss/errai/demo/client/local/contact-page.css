@@ -52,6 +52,38 @@ tr.selected {
 .modal {
   position: absolute;
   display: none;
+  padding-bottom: 10px;
+}
+
+.modal-button {
+  width: 15%;
+  height: 30px;
+  border-radius: 3px;
+  border: 1px solid;
+  font-weight: bold;
+  font-family: inherit;
+  font-size: 1em;
+  color: rgb(40, 40, 40);
+}
+
+.modal-button:active {
+  color: black;
+  border-color: black;
+}
+
+.modal-submit {
+  background-color: #23B523;
+  border-color: darkgreen;
+}
+
+.modal-cancel {
+  background-color: #F5F528;
+  border-color: rgb(144, 144, 0);
+}
+
+.modal-delete {
+  background-color: #FF4040;
+  border-color: darkred;
 }
 
 .new-contact {
