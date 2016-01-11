@@ -35,8 +35,12 @@ tr.selected {
   border-radius: 0;
 }
 
-.contact input, .modal-content input {
+.modal-content input {
   height: 35px;
+}
+
+.modal-content input[type="date"] {
+ height: 40px;
 }
 
 #contact-list {

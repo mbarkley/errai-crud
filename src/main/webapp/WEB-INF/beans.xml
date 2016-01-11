@@ -3,14 +3,17 @@
 
   <scan>
     <!-- These exclusions were added by Errai to avoid deploying client-side classes to the server -->
+    <exclude name = "org.jboss.errai.demo.client.local.ContactList$3" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactEditor" />
-    <exclude name = "org.jboss.errai.demo.client.local.ContactList$SelectionHandler" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactPresenter" />
+    <exclude name = "org.jboss.errai.demo.client.local.ContactList$2" />
+    <exclude name = "org.jboss.errai.demo.client.local.ContactList$4" />
     <exclude name = "org.jboss.errai.demo.client.local.DateConverter" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactList$1" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactDisplay" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactList" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactDisplay$1" />
+    <exclude name = "org.jboss.errai.demo.client.local.ContactList$ListComponentHandler" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactDisplay$2" />
     <!-- End of Errai exclusions -->
   </scan>

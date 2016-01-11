@@ -19,6 +19,9 @@
 <link rel="shortcut icon" href="<%=contextPath%>/favicon.ico">
 <link rel="apple-touch-icon" href="<%=contextPath%>/favicon.ico">
 
+<script type="text/javascript">
+  erraiJaxRsApplicationRoot = "rest";
+</script>
 <script type="text/javascript" src="<%=contextPath%>/app/app.nocache.js"></script>
 </head>
 
