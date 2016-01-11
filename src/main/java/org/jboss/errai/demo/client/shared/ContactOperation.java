@@ -16,39 +16,31 @@
 
 package org.jboss.errai.demo.client.shared;
 
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
+import org.jboss.errai.common.client.api.annotations.MapsTo;
+import org.jboss.errai.common.client.api.annotations.Portable;
 
 /**
  *
  * @author Max Barkley <mbarkley@redhat.com>
  */
-@Path("/contact")
-public interface ContactStorageService {
+@Portable
+public class ContactOperation {
 
-  @GET
-  @Produces("application/json")
-  List<Contact> getAllContacts();
+  private final Contact contact;
+  private final String sourceQueueSessionId;
 
-  @POST
-  @Consumes("application/json")
-  Response create(ContactOperation contactOperation);
+  public ContactOperation(final @MapsTo("contact") Contact contact,
+          final @MapsTo("sourceQueueSessionId") String sourceQueueSessionId) {
+    this.contact = contact;
+    this.sourceQueueSessionId = sourceQueueSessionId;
+  }
 
-  @PUT
-  @Consumes("application/json")
-  Response update(ContactOperation contactOperation);
+  public Contact getContact() {
+    return contact;
+  }
 
-  @DELETE
-  @Path("/{id:[0-9]+}")
-  Response delete(@PathParam("id") Long id);
+  public String getSourceQueueSessionId() {
+    return sourceQueueSessionId;
+  }
 
 }

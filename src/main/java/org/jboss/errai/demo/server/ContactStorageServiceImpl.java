@@ -19,12 +19,17 @@ package org.jboss.errai.demo.server;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.jboss.errai.demo.client.shared.Contact;
+import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
+import org.jboss.errai.demo.client.shared.Created;
+import org.jboss.errai.demo.client.shared.Deleted;
+import org.jboss.errai.demo.client.shared.Updated;
 
 /**
  *
@@ -36,23 +41,36 @@ public class ContactStorageServiceImpl implements ContactStorageService {
   @Inject
   private ContactEntityService entityService;
 
+  @Inject
+  @Created
+  private Event<ContactOperation> created;
+
+  @Inject
+  @Updated
+  private Event<ContactOperation> updated;
+
+  @Inject
+  @Deleted
+  private Event<Long> deleted;
+
   @Override
   public List<Contact> getAllContacts() {
     return entityService.getAllContacts();
   }
 
   @Override
-  public Response create(final Contact contact) {
-    entityService.create(contact);
+  public Response create(final ContactOperation contactOperation) {
+    entityService.create(contactOperation.getContact());
+    created.fire(contactOperation);
 
-    return Response
-            .created(UriBuilder.fromResource(ContactStorageService.class).path(String.valueOf(contact.getId())).build())
-            .build();
+    return Response.created(UriBuilder.fromResource(ContactStorageService.class)
+            .path(String.valueOf(contactOperation.getContact().getId())).build()).build();
   }
 
   @Override
-  public Response update(final Contact contact) {
-    entityService.update(contact);
+  public Response update(final ContactOperation contactOperation) {
+    entityService.update(contactOperation.getContact());
+    updated.fire(contactOperation);
 
     return Response.noContent().build();
   }
@@ -60,6 +78,7 @@ public class ContactStorageServiceImpl implements ContactStorageService {
   @Override
   public Response delete(Long id) {
     entityService.delete(id);
+    deleted.fire(id);
 
     return Response.noContent().build();
   }

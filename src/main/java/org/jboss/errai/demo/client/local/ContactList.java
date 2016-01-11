@@ -17,16 +17,23 @@
 package org.jboss.errai.demo.client.local;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
 import org.jboss.errai.databinding.client.api.AbstractBindableListChangeHandler;
 import org.jboss.errai.demo.client.shared.Contact;
+import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
+import org.jboss.errai.demo.client.shared.Created;
+import org.jboss.errai.demo.client.shared.Deleted;
+import org.jboss.errai.demo.client.shared.Updated;
 import org.jboss.errai.enterprise.client.jaxrs.api.ResponseCallback;
 import org.jboss.errai.ui.client.widget.ListWidget;
 import org.jboss.errai.ui.client.widget.Table;
@@ -36,6 +43,7 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.SinkNative;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
+import org.slf4j.Logger;
 
 import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.dom.client.DivElement;
@@ -76,6 +84,12 @@ public class ContactList {
   @Inject
   private Caller<ContactStorageService> contactService;
 
+  @Inject
+  private ClientMessageBus bus;
+
+  @Inject
+  private Logger logger;
+
   @PostConstruct
   private void setup() {
     list.addBindableListChangeHandler(new AbstractBindableListChangeHandler<Contact>() {
@@ -103,9 +117,41 @@ public class ContactList {
     }).getAllContacts();
   }
 
+  private boolean sourceIsNotThisClient(final ContactOperation contactOperation) {
+    return contactOperation.getSourceQueueSessionId() == null || !contactOperation.getSourceQueueSessionId().equals(bus.getSessionId());
+  }
+
+  public void onRemoteCreated(final @Observes @Created ContactOperation contactOperation) {
+    if (sourceIsNotThisClient(contactOperation)) {
+      list.getValue().add(contactOperation.getContact());
+    }
+  }
+
+  public void onRemoteUpdated(final @Observes @Updated ContactOperation contactOperation) {
+    if (sourceIsNotThisClient(contactOperation)) {
+      final int indexOf = list.getValue().indexOf(contactOperation.getContact());
+      if (indexOf == -1) {
+        logger.warn("Received update before creation for " + contactOperation.getContact() + " from " + contactOperation.getSourceQueueSessionId());
+        list.getValue().add(contactOperation.getContact());
+      } else {
+        list.getComponent(indexOf).setModel(contactOperation.getContact());
+      }
+    }
+  }
+
+  public void onRemoteDelete(final @Observes @Deleted Long id) {
+    final Iterator<Contact> contactIter = list.getValue().iterator();
+    while (contactIter.hasNext()) {
+      if (id.equals(contactIter.next().getId())) {
+        contactIter.remove();
+        break;
+      }
+    }
+  }
+
   @SinkNative(Event.ONCLICK)
   @EventHandler("new-contact")
-  private void onNewContactClick(final Event event) {
+  public void onNewContactClick(final Event event) {
     displayModal(false);
   }
 
@@ -125,11 +171,11 @@ public class ContactList {
 
   @SinkNative(Event.ONCLICK)
   @EventHandler("modal-submit")
-  private void onModalSubmitClick(final Event event) {
+  public void onModalSubmitClick(final Event event) {
     hideModal();
     if (editor.isCopied()) {
       editor.overwriteCopiedModelState();
-      contactService.call().update(editor.getCopied());
+      contactService.call().update(new ContactOperation(editor.getCopied(), bus.getSessionId()));
     }
     else {
       list.getValue().add(editor.getModel());
@@ -144,7 +190,7 @@ public class ContactList {
             component.getModel().setId(id);
           }
         }
-      }).create(editor.getModel());
+      }).create(new ContactOperation(editor.getModel(), bus.getSessionId()));
     }
     editor.setModel(new Contact());
   }
@@ -155,13 +201,13 @@ public class ContactList {
 
   @SinkNative(Event.ONCLICK)
   @EventHandler("modal-cancel")
-  private void onModalCancelClick(final Event event) {
+  public void onModalCancelClick(final Event event) {
     hideModal();
     editor.setModel(new Contact());
   }
 
   @EventHandler("modal-delete")
-  private void onModalDeleteClick(final ClickEvent event) {
+  public void onModalDeleteClick(final ClickEvent event) {
     if (editor.isCopied()) {
       if (lastSelected != null && lastSelected.getModel() == editor.getCopied()) {
         lastSelected = null;
