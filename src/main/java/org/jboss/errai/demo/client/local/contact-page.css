@@ -1,9 +1,10 @@
 .table-container {
+  overflow-x: auto;
   margin: auto;
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 5px;
   padding-top: 10px;
-  padding-bottom: 20px;
+  padding-bottom: 80px;
 }
 
 table {
@@ -54,7 +55,9 @@ tr.selected {
 }
 
 .new-contact {
-  margin: auto;
+  position: fixed;
+  left: 50%;
+  margin-left: -30px;
   height: 60px;
   width: 60px;
   border-radius: 60px;
