@@ -208,7 +208,7 @@
         <configuration>   
           <logLevel>INFO</logLevel>
           <noServer>false</noServer>          
-          <!--extraJvmArgs>-Xmx2048m -XX:CompileThreshold=7000 -XX:MaxPermSize=256M -Derrai.jboss.home=${errai.jboss.home} -Derrai.dev.context=${errai.dev.context} -Derrai.jboss.javaopts="-XX:MaxPermSize=256m" -Derrai.jboss.javaagent.path=${settings.localRepository}/org/jboss/errai/errai-client-local-class-hider/${errai.version}/errai-client-local-class-hider-${errai.version}.jar</extraJvmArgs>
+          <!--extraJvmArgs>-Xmx2048m -XX:CompileThreshold=7000 -Derrai.jboss.home=${errai.jboss.home} -Derrai.dev.context=${errai.dev.context} -Derrai.jboss.javaopts="-Derrai.jboss.javaagent.path=${settings.localRepository}/org/jboss/errai/errai-client-local-class-hider/${errai.version}/errai-client-local-class-hider-${errai.version}.jar</extraJvmArgs>
           <server>org.jboss.errai.cdi.server.gwt.JBossLauncher</server-->
 
           <!-- Errai's embedded WildFly launcher can be used to simplify IDE run configs as  
@@ -218,7 +218,7 @@
             to avoid class loading problems for classes that are not needed on the server. 
             To configure an alternative package filter for client-only classes, specify: 
             -Derrai.client.local.class.pattern=.*/myproject/client/.* -->
-          <extraJvmArgs>-Xmx2048m -XX:CompileThreshold=7000 -XX:MaxPermSize=512M -Derrai.jboss.home=${errai.jboss.home} -Derrai.dev.context=${errai.dev.context}</extraJvmArgs>          
+          <extraJvmArgs>-Xmx2048m -XX:CompileThreshold=7000 -Derrai.jboss.home=${errai.jboss.home} -Derrai.dev.context=${errai.dev.context}</extraJvmArgs>
           <server>org.jboss.errai.cdi.server.gwt.EmbeddedWildFlyLauncher</server>
           <disableCastChecking>true</disableCastChecking>
           <runTarget>${errai.dev.context}/index.jsp</runTarget>
@@ -261,8 +261,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <!-- Unpack jboss-as from maven. Remove this if you wish to use your 
