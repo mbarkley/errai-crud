@@ -16,7 +16,6 @@
 
 package org.jboss.errai.demo.client.local;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import javax.inject.Inject;
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.api.RemoteCallback;
-import org.jboss.errai.databinding.client.api.AbstractBindableListChangeHandler;
+import org.jboss.errai.databinding.client.api.handler.list.ListChangeHandlerBuilder;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
@@ -134,22 +133,17 @@ public class ContactList {
      * handler registers event handlers on new components as they are created that allow selecting, editting, and
      * deleting Contacts.
      */
-    list.addBindableListChangeHandler(new AbstractBindableListChangeHandler<Contact>() {
-      @Override
-      public void onItemAdded(final List<Contact> source, final Contact item) {
-        final ContactDisplay component = list.getComponent(item);
-        final ListComponentHandler handler = new ListComponentHandler(component);
-        component.addClickHandler(handler);
-        component.addDoubleClickHandler(handler);
-      }
-
-      @Override
-      public void onItemsAdded(final List<Contact> source, final Collection<? extends Contact> items) {
-        for (final Contact item : items) {
-          onItemAdded(source, item);
-        }
-      }
-    });
+    list.addBindableListChangeHandler(
+            ListChangeHandlerBuilder.<Contact>create()
+            .withItemAddedHandler((source, item) -> {
+              addContactButtonHandlers(item);
+            })
+            .withItemsAddedHandler((source, items) -> {
+              for (final Contact item : items) {
+                addContactButtonHandlers(item);
+              }
+            })
+            .build());
 
     /*
      * Triggers an HTTP request to the ContactStorageService. The call back will be invoked asynchronously to display
@@ -161,6 +155,13 @@ public class ContactList {
         list.getValue().addAll(contacts);
       }
     }).getAllContacts();
+  }
+
+  private void addContactButtonHandlers(Contact item) {
+    final ContactDisplay component = list.getComponent(item);
+    final ListComponentHandler handler = new ListComponentHandler(component);
+    component.addClickHandler(handler);
+    component.addDoubleClickHandler(handler);
   }
 
   private boolean sourceIsNotThisClient(final ContactOperation contactOperation) {
