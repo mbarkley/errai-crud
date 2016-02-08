@@ -57,4 +57,14 @@ public class DateConverter implements Converter<Date, String> {
     return date.toISOString().substring(0, 10);
   }-*/;
 
+  @Override
+  public Class<Date> getModelType() {
+    return Date.class;
+  }
+
+  @Override
+  public Class<String> getWidgetType() {
+    return String.class;
+  }
+
 }

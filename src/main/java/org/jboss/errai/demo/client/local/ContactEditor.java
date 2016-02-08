@@ -18,7 +18,7 @@ package org.jboss.errai.demo.client.local;
 
 import javax.inject.Inject;
 
-import org.jboss.errai.databinding.client.api.InitialState;
+import org.jboss.errai.databinding.client.api.StateSync;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
@@ -56,8 +56,6 @@ import com.google.gwt.dom.client.TextAreaElement;
  */
 @Templated(value = "contact-page.html#modal-content", stylesheet = "contact-page.css")
 public class ContactEditor extends ContactPresenter {
-
-  private Contact copied;
 
   /**
    * The {@link DataField} annotation for this field declares that this {@link DivElement} is the element from the
@@ -101,49 +99,26 @@ public class ContactEditor extends ContactPresenter {
 
   @Override
   public void setModel(Contact model) {
-    copied = null;
     super.setModel(model);
   }
 
   /**
-   * Copies the state of the given model, but does not remain bound to this model after the method returns. This
-   * {@link ContactEditor} retains an instance to the copied model so that it's state can be overwritten with subsequent
-   * calls to {@link #overwriteCopiedModelState()}.
+   * Sets the given model as the model for this component but pauses data-binding. Any changes made to the UI or model
+   * will not be synchronized until {@link #syncStateFromUI()} is called.
    */
-  public void copyModelState(final Contact model) {
-    final Contact originalModel = getModel();
-    binder.setModel(model, InitialState.FROM_MODEL);
-    binder.setModel(originalModel, InitialState.FROM_UI);
-    copied = model;
+  public void setModelPaused(final Contact model) {
+    binder.setModel(model, StateSync.FROM_MODEL);
+    binder.pause();
   }
 
   /**
-   * True if no calls to {@link #setModel(Contact)} have happened since the last call to
-   * {@link #copyModelState(Contact)}.
+   * If binding is paused, overwrite the state of the model returned by {@link #getCopied()} with the state of the model
+   * returned by {@link #getModel()}.
    */
-  public boolean isCopied() {
-    return copied != null;
-  }
-
-  /**
-   * If {@link #isCopied()} is true, overwrite the state of the model returned by {@link #getCopied()} with the state of
-   * the model returned by {@link #getModel()}.
-   */
-  public void overwriteCopiedModelState() {
-    if (isCopied()) {
-      final Contact workingModel = getModel();
-      binder.setModel(copied, InitialState.FROM_UI);
-      binder.setModel(workingModel);
+  public void syncStateFromUI() {
+    if (binder.isPaused()) {
+      binder.resume(StateSync.FROM_UI);
     }
-  }
-
-  /**
-   * @return If no calls to {@link #setModel(Contact)} have happened since the last call to
-   *         {@link #copyModelState(Contact)}, return the parameter of the last call to {@link #copyModelState(Contact)}
-   *         . Otherwise return <code>null</code>.
-   */
-  public Contact getCopied() {
-    return copied;
   }
 
 }

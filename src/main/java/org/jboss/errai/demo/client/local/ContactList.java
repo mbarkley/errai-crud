@@ -235,7 +235,7 @@ public class ContactList {
   }
 
   private void editModel(final Contact model) {
-    editor.copyModelState(model);
+    editor.setModelPaused(model);
     displayModal(true);
   }
 
@@ -254,7 +254,7 @@ public class ContactList {
   @EventHandler("modal-submit")
   public void onModalSubmitClick(final Event event) {
     hideModal();
-    if (editor.isCopied()) {
+    if (list.getValue().contains(editor.getModel())) {
       updateContactFromEditor();
     }
     else {
@@ -282,8 +282,8 @@ public class ContactList {
   }
 
   private void updateContactFromEditor() {
-    editor.overwriteCopiedModelState();
-    contactService.call().update(new ContactOperation(editor.getCopied(), bus.getSessionId()));
+    editor.syncStateFromUI();
+    contactService.call().update(new ContactOperation(editor.getModel(), bus.getSessionId()));
   }
 
   private void hideModal() {
@@ -319,11 +319,11 @@ public class ContactList {
    */
   @EventHandler("modal-delete")
   public void onModalDeleteClick(final ClickEvent event) {
-    if (editor.isCopied()) {
-      if (lastSelected != null && lastSelected.getModel() == editor.getCopied()) {
+    if (list.getValue().contains(editor.getModel())) {
+      if (lastSelected != null && lastSelected.getModel() == editor.getModel()) {
         lastSelected = null;
       }
-      final Contact deleted = editor.getCopied();
+      final Contact deleted = editor.getModel();
       contactService.call(new ResponseCallback() {
         @Override
         public void callback(final Response response) {
@@ -331,7 +331,7 @@ public class ContactList {
             list.getValue().remove(deleted);
           }
         }
-      }).delete(editor.getCopied().getId());
+      }).delete(editor.getModel().getId());
       editor.setModel(new Contact());
       hideModal();
     }
