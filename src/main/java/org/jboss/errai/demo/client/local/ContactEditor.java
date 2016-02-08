@@ -116,9 +116,8 @@ public class ContactEditor extends ContactPresenter {
    * returned by {@link #getModel()}.
    */
   public void syncStateFromUI() {
-    if (binder.isPaused()) {
-      binder.resume(StateSync.FROM_UI);
-    }
+    // Does nothing if already resumed.
+    binder.resume(StateSync.FROM_UI);
   }
 
 }
