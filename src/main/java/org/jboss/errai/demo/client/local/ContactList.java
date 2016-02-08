@@ -25,7 +25,7 @@ import javax.inject.Inject;
 
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.api.RemoteCallback;
+import org.jboss.errai.common.client.function.Optional;
 import org.jboss.errai.databinding.client.api.handler.list.ListChangeHandlerBuilder;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
@@ -88,7 +88,7 @@ import com.google.gwt.user.client.Event;
 @Templated(value = "contact-page.html#contact-list", stylesheet = "contact-page.css")
 public class ContactList {
 
-  private ContactDisplay lastSelected;
+  private Optional<ContactDisplay> lastSelected = Optional.empty();
 
   @Inject
   @DataField
@@ -149,12 +149,7 @@ public class ContactList {
      * Triggers an HTTP request to the ContactStorageService. The call back will be invoked asynchronously to display
      * all retrieved contacts.
      */
-    contactService.call(new RemoteCallback<List<Contact>>() {
-      @Override
-      public void callback(final List<Contact> contacts) {
-        list.getValue().addAll(contacts);
-      }
-    }).getAllContacts();
+    contactService.call((List<Contact> contacts) -> list.getValue().addAll(contacts)).getAllContacts();
   }
 
   private void addContactButtonHandlers(Contact item) {
@@ -268,16 +263,13 @@ public class ContactList {
     // Adding this model to the list will create and display a new, bound ContactDisplay in the table.
     list.getValue().add(editor.getModel());
     final ContactDisplay component = list.getComponent(editor.getModel());
-    contactService.call(new ResponseCallback() {
-      @Override
-      public void callback(final Response response) {
-        // Set the id if we successfully create this contact.
-        if (response.getStatusCode() == Response.SC_CREATED) {
-          final String createdUri = response.getHeader("Location");
-          final String idString = createdUri.substring(createdUri.lastIndexOf('/')+1);
-          final long id = Long.parseLong(idString);
-          component.getModel().setId(id);
-        }
+    contactService.call((ResponseCallback) response -> {
+      // Set the id if we successfully create this contact.
+      if (response.getStatusCode() == Response.SC_CREATED) {
+        final String createdUri = response.getHeader("Location");
+        final String idString = createdUri.substring(createdUri.lastIndexOf('/')+1);
+        final long id = Long.parseLong(idString);
+        component.getModel().setId(id);
       }
     }).create(new ContactOperation(editor.getModel(), bus.getSessionId()));
   }
@@ -321,16 +313,11 @@ public class ContactList {
   @EventHandler("modal-delete")
   public void onModalDeleteClick(final ClickEvent event) {
     if (list.getValue().contains(editor.getModel())) {
-      if (lastSelected != null && lastSelected.getModel() == editor.getModel()) {
-        lastSelected = null;
-      }
+      lastSelected.filter(s -> s.getModel() == editor.getModel()).ifPresent(s -> lastSelected = Optional.empty());
       final Contact deleted = editor.getModel();
-      contactService.call(new ResponseCallback() {
-        @Override
-        public void callback(final Response response) {
-          if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-            list.getValue().remove(deleted);
-          }
+      contactService.call((ResponseCallback) response -> {
+        if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+          list.getValue().remove(deleted);
         }
       }).delete(editor.getModel().getId());
       editor.setModel(new Contact());
@@ -356,11 +343,9 @@ public class ContactList {
     }
 
     private void selectComponent() {
-      if (lastSelected != null && lastSelected != component) {
-        lastSelected.setSelected(false);
-      }
+      lastSelected.filter(s -> s != component).ifPresent(s -> s.setSelected(false));
       component.setSelected(true);
-      lastSelected = component;
+      lastSelected = Optional.of(component);
     }
 
     @Override
