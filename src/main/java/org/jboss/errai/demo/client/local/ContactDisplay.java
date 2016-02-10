@@ -16,9 +16,7 @@
 
 package org.jboss.errai.demo.client.local;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,13 +27,11 @@ import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
  * <p>
@@ -69,9 +65,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
  */
 @Templated(value = "contact-page.html#contact", stylesheet = "contact-page.css")
 public class ContactDisplay extends ContactPresenter {
-
-  private final List<ClickHandler> clickHandlers = new ArrayList<ClickHandler>();
-  private final List<DoubleClickHandler> doubleClickHandlers = new ArrayList<DoubleClickHandler>();
 
   /**
    * This element is the root element of this component (as declared in the {@code #contact} fragment of the
@@ -113,36 +106,20 @@ public class ContactDisplay extends ContactPresenter {
   @Bound @DataField
   private TableCellElement notes;
 
-  public HandlerRegistration addClickHandler(final ClickHandler handler) {
-    clickHandlers.add(handler);
+  @Inject
+  @Click
+  private Event<ContactDisplay> click;
 
-    return new HandlerRegistration() {
-      @Override
-      public void removeHandler() {
-        clickHandlers.remove(handler);
-      }
-    };
-  }
-
-  public HandlerRegistration addDoubleClickHandler(final DoubleClickHandler handler) {
-    doubleClickHandlers.add(handler);
-
-    return new HandlerRegistration() {
-      @Override
-      public void removeHandler() {
-        doubleClickHandlers.remove(handler);
-      }
-    };
-  }
+  @Inject
+  @DoubleClick
+  private Event<ContactDisplay> dblClick;
 
   /**
    * Called for single-click events on the {@link DataField @DataField} {@link #contact}.
    */
   @EventHandler("contact")
   public void onClick(final ClickEvent event) {
-    for (final ClickHandler handler : clickHandlers) {
-      handler.onClick(event);
-    }
+    click.fire(this);
   }
 
   /**
@@ -150,9 +127,7 @@ public class ContactDisplay extends ContactPresenter {
    */
   @EventHandler("contact")
   public void onDoubleClick(final DoubleClickEvent event) {
-    for (final DoubleClickHandler handler : doubleClickHandlers) {
-      handler.onDoubleClick(event);
-    }
+    dblClick.fire(this);
   }
 
   /**
@@ -168,6 +143,10 @@ public class ContactDisplay extends ContactPresenter {
     } else {
       contact.removeClassName("selected");
     }
+  }
+
+  public Element getRoot() {
+    return contact;
   }
 
 }
