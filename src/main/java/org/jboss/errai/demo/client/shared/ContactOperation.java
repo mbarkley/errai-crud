@@ -26,8 +26,6 @@ import org.jboss.errai.common.client.api.annotations.Portable;
  * <p>
  * This type encapulates a session id as well as a {@link Contact} so that the client that orginally created or updated
  * a {@link Contact} can ignore the event.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Portable
 public class ContactOperation {

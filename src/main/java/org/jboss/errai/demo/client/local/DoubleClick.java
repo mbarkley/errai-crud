@@ -21,6 +21,11 @@ import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Qualifier;
 
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+
+/**
+ * A CDI qualifier for events fired on UI components. Indicates the component received a {@link DoubleClickEvent}.
+ */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DoubleClick {

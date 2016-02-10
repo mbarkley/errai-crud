@@ -25,8 +25,6 @@ import javax.inject.Qualifier;
 /**
  * Qualifier for {@link ContactOperation} to differentiate the updating of existing {@link Contact Contacts} from the
  * creation of new ones.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Qualifier
 @Documented

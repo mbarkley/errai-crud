@@ -20,33 +20,25 @@ import javax.inject.Inject;
 
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.demo.client.shared.Contact;
-import org.jboss.errai.ui.client.widget.HasModel;
-import org.jboss.errai.ui.client.widget.ListWidget;
 import org.jboss.errai.ui.shared.api.annotations.AutoBound;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 
 /**
- * A base class for Errai UI components that present {@link Contact Contacts}. By implementing {@link HasModel},
- * subclasses of {@code ContactPresenter} can be used for displaying lists of {@link Contact Contacts} in a
- * {@link ListWidget}.
+ * A base class for Errai UI components that present {@link Contact Contacts}.
  *
  * This class has an {@link AutoBound @AutoBound} {@link DataBinder} so that UI components in subclasses annotated with
  * {@link Bound @Bound} are kept in sync with the assigned {@link Contact} model properties via Errai Data-Binding.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
-public class ContactPresenter implements HasModel<Contact> {
+public class ContactPresenter {
 
   @Inject
   @AutoBound
   protected DataBinder<Contact> binder;
 
-  @Override
   public Contact getModel() {
     return binder.getModel();
   }
 
-  @Override
   public void setModel(final Contact model) {
     binder.setModel(model);
   }

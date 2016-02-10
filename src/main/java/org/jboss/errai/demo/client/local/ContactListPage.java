@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.function.Optional;
+import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
@@ -33,10 +34,9 @@ import org.jboss.errai.demo.client.shared.Created;
 import org.jboss.errai.demo.client.shared.Deleted;
 import org.jboss.errai.demo.client.shared.Updated;
 import org.jboss.errai.enterprise.client.jaxrs.api.ResponseCallback;
-import org.jboss.errai.ui.client.widget.ListWidget;
-import org.jboss.errai.ui.client.widget.Table;
 import org.jboss.errai.ui.nav.client.local.DefaultPage;
 import org.jboss.errai.ui.nav.client.local.Page;
+import org.jboss.errai.ui.shared.api.annotations.AutoBound;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
@@ -69,23 +69,28 @@ import com.google.gwt.user.client.Event;
  * will replace the contents of the {@code modal-content} div in this component.
  *
  * <p>
- * This component uses a {@link ListWidget} to display a list of {@link Contact Contacts}. The {@code List<Contact>}
- * returned by {@link ListWidget#getValue()} is a model bound to a table of {@link ContactDisplay ContactDisplays} in an
- * HTML table. Any changes to the model list (such as adding or removing items) will be automatically reflected in the
- * displayed table. Because each individual {@link ContactDisplay} uses Errai Data-Binding internally, changes to an
- * individual {@link Contact} will also be reflected in the UI.
+ * This component uses {@link ContactList} to display a list of {@link Contact Contacts}. The {@code List<Contact>}
+ * returned by calling {@link DataBinder#getModel()} on {@link #binder} is a model bound to a table of
+ * {@link ContactDisplay ContactDisplays} in an HTML table. Any changes to the model list (such as adding or removing
+ * items) will be automatically reflected in the displayed table. See {@link ContactList} for more details.
  *
  * <p>
  * Instances of this type should be obtained via Errai IoC, either by using {@link Inject} in another container managed
  * bean, or by programmatic lookup through the bean manager.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Page(role = DefaultPage.class)
 @Templated(value = "contact-page.html#contact-list", stylesheet = "contact-page.css")
 public class ContactListPage {
 
-  private Optional<ContactDisplay> lastSelected = Optional.empty();
+  @Inject
+  @AutoBound
+  private DataBinder<List<Contact>> binder;
+
+  /* By binding to "this", the ContactList is kept in sync with the list from binder. */
+  @Inject
+  @Bound(property="this")
+  @DataField
+  private ContactList list;
 
   @Inject
   @DataField
@@ -98,15 +103,6 @@ public class ContactListPage {
   @Inject
   @DataField("modal-delete")
   private ButtonElement delete;
-
-  /**
-   * The {@link Table} qualifier gives us a {@link ListWidget} that will display entires as table rows. The default
-   * behaviour displays each entry in a {@code <div>}.
-   */
-  @Inject
-  @Bound(property="this")
-  @DataField
-  private ContactList list;
 
   /**
    * This is a simple interface for calling a remote HTTP service. Behind this interface, Errai has generated an HTTP
@@ -130,11 +126,7 @@ public class ContactListPage {
      * Triggers an HTTP request to the ContactStorageService. The call back will be invoked asynchronously to display
      * all retrieved contacts.
      */
-    contactService.call((List<Contact> contacts) -> list.getValue().addAll(contacts)).getAllContacts();
-  }
-
-  private boolean sourceIsNotThisClient(final ContactOperation contactOperation) {
-    return contactOperation.getSourceQueueSessionId() == null || !contactOperation.getSourceQueueSessionId().equals(bus.getSessionId());
+    contactService.call((List<Contact> contacts) -> binder.getModel().addAll(contacts)).getAllContacts();
   }
 
   /**
@@ -143,7 +135,7 @@ public class ContactListPage {
    */
   public void onRemoteCreated(final @Observes @Created ContactOperation contactOperation) {
     if (sourceIsNotThisClient(contactOperation)) {
-      list.getValue().add(contactOperation.getContact());
+      binder.getModel().add(contactOperation.getContact());
     }
   }
 
@@ -154,12 +146,12 @@ public class ContactListPage {
    */
   public void onRemoteUpdated(final @Observes @Updated ContactOperation contactOperation) {
     if (sourceIsNotThisClient(contactOperation)) {
-      final int indexOf = list.getValue().indexOf(contactOperation.getContact());
+      final int indexOf = binder.getModel().indexOf(contactOperation.getContact());
       if (indexOf == -1) {
         logger.warn("Received update before creation for " + contactOperation.getContact() + " from " + contactOperation.getSourceQueueSessionId());
-        list.getValue().add(contactOperation.getContact());
+        binder.getModel().add(contactOperation.getContact());
       } else {
-        list.getValue().set(indexOf, contactOperation.getContact());
+        binder.getModel().set(indexOf, contactOperation.getContact());
       }
     }
   }
@@ -170,7 +162,7 @@ public class ContactListPage {
    * browser sessions.
    */
   public void onRemoteDelete(final @Observes @Deleted Long id) {
-    final Iterator<Contact> contactIter = list.getValue().iterator();
+    final Iterator<Contact> contactIter = binder.getModel().iterator();
     while (contactIter.hasNext()) {
       if (id.equals(contactIter.next().getId())) {
         contactIter.remove();
@@ -192,21 +184,7 @@ public class ContactListPage {
   @SinkNative(Event.ONCLICK)
   @EventHandler("new-contact")
   public void onNewContactClick(final Event event) {
-    displayModal(false);
-  }
-
-  private void displayModal(final boolean withDelete) {
-    if (withDelete) {
-      delete.getStyle().clearDisplay();
-    } else {
-      delete.getStyle().setDisplay(Display.NONE);
-    }
-    modal.getStyle().setDisplay(Display.BLOCK);
-  }
-
-  private void editModel(final Contact model) {
-    editor.setModelPaused(model);
-    displayModal(true);
+    displayModal(Optional.empty());
   }
 
   /**
@@ -224,19 +202,18 @@ public class ContactListPage {
   @EventHandler("modal-submit")
   public void onModalSubmitClick(final Event event) {
     hideModal();
-    if (list.getValue().contains(editor.getModel())) {
+    if (binder.getModel().contains(editor.getModel())) {
       updateContactFromEditor();
     }
     else {
       createNewContactFromEditor();
     }
-    editor.setModel(new Contact());
   }
 
   private void createNewContactFromEditor() {
     final Contact editorModel = editor.getModel();
     // Adding this model to the list will create and display a new, bound ContactDisplay in the table.
-    list.getValue().add(editorModel);
+    binder.getModel().add(editorModel);
     contactService.call((ResponseCallback) response -> {
       // Set the id if we successfully create this contact.
       if (response.getStatusCode() == Response.SC_CREATED) {
@@ -249,12 +226,12 @@ public class ContactListPage {
   }
 
   private void updateContactFromEditor() {
+    /*
+     * When editting a contact we paused binding so that changes from the UI do not propogate to the model until
+     * "submit" is clicked. This call updates the model with all changes made in the UI while binding was paused.
+     */
     editor.syncStateFromUI();
     contactService.call().update(new ContactOperation(editor.getModel(), bus.getSessionId()));
-  }
-
-  private void hideModal() {
-    modal.getStyle().clearDisplay();
   }
 
   /**
@@ -271,7 +248,6 @@ public class ContactListPage {
   @EventHandler("modal-cancel")
   public void onModalCancelClick(final Event event) {
     hideModal();
-    editor.setModel(new Contact());
   }
 
   /**
@@ -286,12 +262,11 @@ public class ContactListPage {
    */
   @EventHandler("modal-delete")
   public void onModalDeleteClick(final ClickEvent event) {
-    if (list.getValue().contains(editor.getModel())) {
-      lastSelected.filter(s -> s.getModel() == editor.getModel()).ifPresent(s -> lastSelected = Optional.empty());
+    if (binder.getModel().contains(editor.getModel())) {
       final Contact deleted = editor.getModel();
       contactService.call((ResponseCallback) response -> {
         if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
-          list.getValue().remove(deleted);
+          binder.getModel().remove(deleted);
         }
       }).delete(editor.getModel().getId());
       editor.setModel(new Contact());
@@ -299,14 +274,47 @@ public class ContactListPage {
     }
   }
 
-  public void selectComponent(@Observes @Click final ContactDisplay component) {
-    lastSelected.filter(s -> s != component).ifPresent(s -> s.setSelected(false));
-    component.setSelected(true);
-    lastSelected = Optional.of(component);
+  /**
+   * Observes local CDI events fired from
+   * {@link ContactDisplay#onDoubleClick(com.google.gwt.event.dom.client.DoubleClickEvent)}, in order to display the
+   * modal form for editting a contact.
+   */
+  public void editComponent(@Observes @DoubleClick final ContactDisplay component) {
+    list.selectComponent(component);
+    editModel(component.getModel());
   }
 
-  public void editComponent(@Observes @DoubleClick final ContactDisplay component) {
-    selectComponent(component);
-    editModel(component.getModel());
+  /**
+   * For ignoring remote events that originate from this client.
+   */
+  private boolean sourceIsNotThisClient(final ContactOperation contactOperation) {
+    return contactOperation.getSourceQueueSessionId() == null || !contactOperation.getSourceQueueSessionId().equals(bus.getSessionId());
+  }
+
+  /**
+   * If the model is present, then this displays a form for editting (with a delete button). Otherwise show a form for
+   * new contacts (no delete button).
+   */
+  private void displayModal(final Optional<Contact> model) {
+    editor.setModel(model.orElseGet(() -> new Contact()));
+    if (model.isPresent()) {
+      delete.getStyle().clearDisplay();
+    } else {
+      delete.getStyle().setDisplay(Display.NONE);
+    }
+    modal.getStyle().setDisplay(Display.BLOCK);
+  }
+
+  private void editModel(final Contact model) {
+    /*
+     * This sets the editor model with data-binding paused so that changes to the model are not propogated until the
+     * user clicks "submit".
+     */
+    editor.setModelPaused(model);
+    displayModal(Optional.ofNullable(model));
+  }
+
+  private void hideModal() {
+    modal.getStyle().clearDisplay();
   }
 }

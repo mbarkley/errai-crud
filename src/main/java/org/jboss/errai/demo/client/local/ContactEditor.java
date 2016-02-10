@@ -51,8 +51,6 @@ import com.google.gwt.dom.client.TextAreaElement;
  * <p>
  * Instances of this type should be obtained via Errai IoC, either by using {@link Inject} in another container managed
  * bean, or by programmatic lookup through the bean manager.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Templated(value = "contact-page.html#modal-content", stylesheet = "contact-page.css")
 public class ContactEditor extends ContactPresenter {
@@ -97,11 +95,6 @@ public class ContactEditor extends ContactPresenter {
     return root;
   }
 
-  @Override
-  public void setModel(Contact model) {
-    super.setModel(model);
-  }
-
   /**
    * Sets the given model as the model for this component but pauses data-binding. Any changes made to the UI or model
    * will not be synchronized until {@link #syncStateFromUI()} is called.
@@ -112,8 +105,7 @@ public class ContactEditor extends ContactPresenter {
   }
 
   /**
-   * If binding is paused, overwrite the state of the model returned by {@link #getCopied()} with the state of the model
-   * returned by {@link #getModel()}.
+   * If binding is paused, overwrite the state of the model with the state from the UI.
    */
   public void syncStateFromUI() {
     // Does nothing if already resumed.

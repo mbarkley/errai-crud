@@ -28,8 +28,6 @@ import org.jboss.errai.demo.client.shared.Contact;
 
 /**
  * A service that provides transaction boundaries around CRUD operations on {@link Contact Contacts}.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Stateless
 @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)

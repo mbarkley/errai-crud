@@ -45,8 +45,6 @@ import com.google.gwt.i18n.shared.DateTimeFormat.PredefinedFormat;
  * <p>
  * {@link Entity} allows this class to be easily persisted on the server via JPA and {@link NamedQueries} defines a
  * query for looking up all persisted {@link Contact Contacts}.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Bindable
 @Portable

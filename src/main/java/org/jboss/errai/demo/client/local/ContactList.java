@@ -22,25 +22,44 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.jboss.errai.databinding.client.BindableListWrapper;
-import org.jboss.errai.databinding.client.api.DataBinder;
+import org.jboss.errai.common.client.function.Optional;
 import org.jboss.errai.databinding.client.api.handler.list.BindableListChangeHandler;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 
 import com.google.gwt.dom.client.TableSectionElement;
-import com.google.gwt.user.client.TakesValue;
+import com.google.gwt.event.dom.client.ClickEvent;
 
+/**
+ * <p>
+ * An Errai UI component for displaying a list of {@link Contact Contacts}. The HTML markup for this {@link Templated}
+ * component is the HTML element with the CSS class {@code contact-list} in the file {@code contact-page.html} in this
+ * package.
+ *
+ * <p>
+ * The {@link DataField} annotation marks fields that replace HTML elements from the template file. As an example, the
+ * field {@link ContactDisplay#editor} replaces the {@code <div>} element in the template with the CSS class
+ * {@code modal-content}. Because {@link ContactEditor} is an Errai UI component, the markup for {@link ContactEditor}
+ * will replace the contents of the {@code modal-content} div in this component.
+ *
+ * <p>
+ * This class implements {@link BindableListChangeHandler} so it can be bound to a list of {@link Contact Contacts}. See
+ * {@link ContactListPage} to see a {@link ContactList} bound with declarative data-binding.
+ *
+ * <p>
+ * Instances of this type should be obtained via Errai IoC, either by using {@link Inject} in another container managed
+ * bean, or by programmatic lookup through the bean manager.
+ */
 @Templated("contact-page.html#list")
-public class ContactList implements TakesValue<List<Contact>>, BindableListChangeHandler<Contact> {
+public class ContactList implements BindableListChangeHandler<Contact> {
 
-  @Inject
-  private DataBinder<List<Contact>> binder;
+  private Optional<ContactDisplay> lastSelected = Optional.empty();
 
   @Inject
   @Named(TableSectionElement.TAG_TBODY)
@@ -54,23 +73,24 @@ public class ContactList implements TakesValue<List<Contact>>, BindableListChang
 
   @PostConstruct
   private void setup() {
+    // Remove the place-holder table row in the template
     list.removeAllChildren();
-    addBindableChangeHandler();
   }
 
-  @Override
-  public void setValue(final List<Contact> value) {
-    final List<Contact> oldList = binder.getModel();
-    binder.setModel(value);
-    if (binder.getModel() != oldList) {
-      addBindableChangeHandler();
-    }
+  /**
+   * This method observes CDI events fired locally by {@link ContactDisplay#onClick(ClickEvent)} in order to highlight a
+   * {@link ContactDisplay} when it is clicked.
+   */
+  public void selectComponent(@Observes @Click final ContactDisplay component) {
+    lastSelected.filter(s -> s != component).ifPresent(s -> s.setSelected(false));
+    component.setSelected(true);
+    lastSelected = Optional.ofNullable(component);
   }
 
-  @Override
-  public List<Contact> getValue() {
-    return binder.getModel();
-  }
+  /*
+   * The BindableListChangeHandler defines default implementations for most of the handler methods. The following three
+   * methods are the only abstract methods that must be implemented.
+   */
 
   @Override
   public void onItemsAddedAt(final List<Contact> source, final int index, final Collection<? extends Contact> items) {
@@ -90,11 +110,14 @@ public class ContactList implements TakesValue<List<Contact>>, BindableListChang
     for (final int i : indexes) {
       final ContactDisplay removed = displays.remove(i);
       removed.getRoot().removeFromParent();
+      // If we are removing the selected contact, clear lastSelected.
+      lastSelected.filter(s -> s.getModel() == removed.getModel())
+                  .ifPresent(s -> lastSelected = Optional.empty());
     }
   }
 
   @Override
-  public void onItemChanged(List<Contact> source, int index, Contact item) {
+  public void onItemChanged(final List<Contact> source, final int index, final Contact item) {
     displays.get(index).setModel(item);
   }
 
@@ -112,14 +135,5 @@ public class ContactList implements TakesValue<List<Contact>>, BindableListChang
     else {
       list.insertAfter(display.getRoot(), displays.get(index-1).getRoot());
     }
-  }
-
-  private BindableListWrapper<Contact> getListAsWrapper() {
-    return (BindableListWrapper<Contact>) binder.getModel();
-  }
-
-  private void addBindableChangeHandler() {
-    final BindableListWrapper<Contact> wrapper = getListAsWrapper();
-    wrapper.addChangeHandler(this);
   }
 }

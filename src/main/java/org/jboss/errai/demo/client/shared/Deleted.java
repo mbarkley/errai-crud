@@ -25,8 +25,6 @@ import javax.inject.Qualifier;
 
 /**
  * A qualifier for observing id values fired as CDI {@link Event Events} for deleted {@link Contact Contacts}.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Qualifier
 @Documented

@@ -60,8 +60,6 @@ import com.google.gwt.event.dom.client.DoubleClickEvent;
  * <p>
  * Instances of this type should be obtained via Errai IoC, either by using {@link Inject} in another container managed
  * bean, or by programmatic lookup through the bean manager.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Templated(value = "contact-page.html#contact", stylesheet = "contact-page.css")
 public class ContactDisplay extends ContactPresenter {
@@ -115,7 +113,8 @@ public class ContactDisplay extends ContactPresenter {
   private Event<ContactDisplay> dblClick;
 
   /**
-   * Called for single-click events on the {@link DataField @DataField} {@link #contact}.
+   * Called for single-click events on the {@link DataField @DataField} {@link #contact}. This event is observed by
+   * {@link ContactList#selectComponent(ContactDisplay)}.
    */
   @EventHandler("contact")
   public void onClick(final ClickEvent event) {
@@ -123,7 +122,8 @@ public class ContactDisplay extends ContactPresenter {
   }
 
   /**
-   * Called for double-click events on the {@link DataField @DataField} {@link #contact}.
+   * Called for double-click events on the {@link DataField @DataField} {@link #contact}. This event is observed by
+   * {@link ContactListPage#editComponent(ContactDisplay)}.
    */
   @EventHandler("contact")
   public void onDoubleClick(final DoubleClickEvent event) {
@@ -133,8 +133,8 @@ public class ContactDisplay extends ContactPresenter {
   /**
    * Marks this as selected (or not) so that it may be styled differently in the UI.
    *
-   * @param If
-   *          {@code true}, add the CSS class "selected" to the {@code <tr>} tag in this component. If {@code false},
+   * @param selected
+   *          If {@code true}, add the CSS class "selected" to the {@code <tr>} tag in this component. If {@code false},
    *          remove the CSS class "selected" from the {@code <tr>} tag in this component.
    */
   public void setSelected(final boolean selected) {

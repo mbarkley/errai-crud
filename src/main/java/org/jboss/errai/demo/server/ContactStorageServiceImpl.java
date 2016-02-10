@@ -35,8 +35,6 @@ import org.jboss.errai.demo.client.shared.Updated;
  * Server-side implementation for the RPC service, {@link ContactStorageService}. Performs database CRUD operations
  * using the {@link ContactEntityService} and fires Errai CDI {@link Event Events} that are observed by clients over the
  * wire to publish creation, update, and deletion of {@link Contact Contacts}.
- *
- * @author Max Barkley <mbarkley@redhat.com>
  */
 @Stateless
 public class ContactStorageServiceImpl implements ContactStorageService {
