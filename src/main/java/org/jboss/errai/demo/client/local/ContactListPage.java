@@ -279,7 +279,7 @@ public class ContactListPage {
    * {@link ContactDisplay#onDoubleClick(com.google.gwt.event.dom.client.DoubleClickEvent)}, in order to display the
    * modal form for editting a contact.
    */
-  public void editComponent(@Observes @DoubleClick final ContactDisplay component) {
+  public void editComponent(final @Observes @DoubleClick ContactDisplay component) {
     list.selectComponent(component);
     editModel(component.getModel());
   }

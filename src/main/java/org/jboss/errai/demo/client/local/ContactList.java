@@ -59,7 +59,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 @Templated("contact-page.html#list")
 public class ContactList implements BindableListChangeHandler<Contact> {
 
-  private Optional<ContactDisplay> lastSelected = Optional.empty();
+  private Optional<ContactDisplay> selected = Optional.empty();
 
   @Inject
   @Named(TableSectionElement.TAG_TBODY)
@@ -81,10 +81,10 @@ public class ContactList implements BindableListChangeHandler<Contact> {
    * This method observes CDI events fired locally by {@link ContactDisplay#onClick(ClickEvent)} in order to highlight a
    * {@link ContactDisplay} when it is clicked.
    */
-  public void selectComponent(@Observes @Click final ContactDisplay component) {
-    lastSelected.filter(s -> s != component).ifPresent(s -> s.setSelected(false));
+  public void selectComponent(final @Observes @Click ContactDisplay component) {
+    selected.filter(s -> s != component).ifPresent(s -> s.setSelected(false));
     component.setSelected(true);
-    lastSelected = Optional.ofNullable(component);
+    selected = Optional.ofNullable(component);
   }
 
   /*
@@ -110,9 +110,9 @@ public class ContactList implements BindableListChangeHandler<Contact> {
     for (final int i : indexes) {
       final ContactDisplay removed = displays.remove(i);
       removed.getRoot().removeFromParent();
-      // If we are removing the selected contact, clear lastSelected.
-      lastSelected.filter(s -> s.getModel() == removed.getModel())
-                  .ifPresent(s -> lastSelected = Optional.empty());
+      // In case we are removing the selected display.
+      selected.filter(s -> s.getModel() == removed.getModel())
+                  .ifPresent(s -> selected = Optional.empty());
     }
   }
 
