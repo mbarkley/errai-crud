@@ -16,17 +16,20 @@
 
 package org.jboss.errai.demo.client.local;
 
+import static org.jboss.errai.databinding.client.components.ListComponent.forIsElementComponent;
+
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
-import org.jboss.errai.common.client.function.Optional;
 import org.jboss.errai.databinding.client.api.DataBinder;
+import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
@@ -86,11 +89,16 @@ public class ContactListPage {
   @AutoBound
   private DataBinder<List<Contact>> binder;
 
-  /* By binding to "this", the ContactList is kept in sync with the list from binder. */
   @Inject
+  private Instance<ContactDisplay> displayFactory;
+
+  /* By binding to "this", the ContactList is kept in sync with the list from binder. */
   @Bound(property="this")
   @DataField
-  private ContactList list;
+  private ListComponent<Contact, ContactDisplay> list = forIsElementComponent(
+                                                          () -> displayFactory.get(),
+                                                          display -> displayFactory.destroy(display))
+                                                        .inTBody();
 
   @Inject
   @DataField
@@ -127,6 +135,10 @@ public class ContactListPage {
      * all retrieved contacts.
      */
     contactService.call((List<Contact> contacts) -> binder.getModel().addAll(contacts)).getAllContacts();
+    // Remove placeholder table row from template.
+    list.getElement().removeAllChildren();
+    list.setSelector(display -> display.setSelected(true));
+    list.setDeselector(display -> display.setSelected(false));
   }
 
   /**
@@ -184,7 +196,8 @@ public class ContactListPage {
   @SinkNative(Event.ONCLICK)
   @EventHandler("new-contact")
   public void onNewContactClick(final Event event) {
-    displayModal(Optional.empty());
+    editor.setValue(new Contact());
+    displayModal(false);
   }
 
   /**
@@ -202,7 +215,7 @@ public class ContactListPage {
   @EventHandler("modal-submit")
   public void onModalSubmitClick(final Event event) {
     hideModal();
-    if (binder.getModel().contains(editor.getModel())) {
+    if (binder.getModel().contains(editor.getValue())) {
       updateContactFromEditor();
     }
     else {
@@ -211,7 +224,7 @@ public class ContactListPage {
   }
 
   private void createNewContactFromEditor() {
-    final Contact editorModel = editor.getModel();
+    final Contact editorModel = editor.getValue();
     // Adding this model to the list will create and display a new, bound ContactDisplay in the table.
     binder.getModel().add(editorModel);
     contactService.call((ResponseCallback) response -> {
@@ -231,7 +244,7 @@ public class ContactListPage {
      * "submit" is clicked. This call updates the model with all changes made in the UI while binding was paused.
      */
     editor.syncStateFromUI();
-    contactService.call().update(new ContactOperation(editor.getModel(), bus.getSessionId()));
+    contactService.call().update(new ContactOperation(editor.getValue(), bus.getSessionId()));
   }
 
   /**
@@ -262,14 +275,14 @@ public class ContactListPage {
    */
   @EventHandler("modal-delete")
   public void onModalDeleteClick(final ClickEvent event) {
-    if (binder.getModel().contains(editor.getModel())) {
-      final Contact deleted = editor.getModel();
+    if (binder.getModel().contains(editor.getValue())) {
+      final Contact deleted = editor.getValue();
       contactService.call((ResponseCallback) response -> {
         if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
           binder.getModel().remove(deleted);
         }
-      }).delete(editor.getModel().getId());
-      editor.setModel(new Contact());
+      }).delete(editor.getValue().getId());
+      editor.setValue(new Contact());
       hideModal();
     }
   }
@@ -280,8 +293,17 @@ public class ContactListPage {
    * modal form for editting a contact.
    */
   public void editComponent(final @Observes @DoubleClick ContactDisplay component) {
+    selectComponent(component);
+    editModel(component.getValue());
+  }
+
+  /**
+   * This method observes CDI events fired locally by {@link ContactDisplay#onClick(ClickEvent)} in order to highlight a
+   * {@link ContactDisplay} when it is clicked.
+   */
+  public void selectComponent(final @Observes @Click ContactDisplay component) {
+    list.deselectAll();
     list.selectComponent(component);
-    editModel(component.getModel());
   }
 
   /**
@@ -292,12 +314,11 @@ public class ContactListPage {
   }
 
   /**
-   * If the model is present, then this displays a form for editting (with a delete button). Otherwise show a form for
+   * If the parameter is true then this displays a form for editting (with a delete button). Otherwise show a form for
    * new contacts (no delete button).
    */
-  private void displayModal(final Optional<Contact> model) {
-    editor.setModel(model.orElseGet(() -> new Contact()));
-    if (model.isPresent()) {
+  private void displayModal(final boolean showDelete) {
+    if (showDelete) {
       delete.getStyle().clearDisplay();
     } else {
       delete.getStyle().setDisplay(Display.NONE);
@@ -310,8 +331,8 @@ public class ContactListPage {
      * This sets the editor model with data-binding paused so that changes to the model are not propogated until the
      * user clicks "submit".
      */
-    editor.setModelPaused(model);
-    displayModal(Optional.ofNullable(model));
+    editor.setValuePaused(model);
+    displayModal(true);
   }
 
   private void hideModal() {

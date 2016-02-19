@@ -20,6 +20,7 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.jboss.errai.common.client.api.IsElement;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.client.widget.ListWidget;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
@@ -37,7 +38,7 @@ import com.google.gwt.event.dom.client.DoubleClickEvent;
  * <p>
  * An Errai UI component for displaying a single {@link Contact} as a row in an HTML table. Can be used to display
  * {@link Contact Contacts} in a {@link ListWidget}. This component can be bound to a {@link Contact} by calling
- * {@link #setModel(Contact)}.
+ * {@link #setValue(Contact)}.
  *
  * <p>
  * The HTML markup for this {@link Templated} component is the HTML element with the CSS class {@code contact} in the
@@ -62,7 +63,7 @@ import com.google.gwt.event.dom.client.DoubleClickEvent;
  * bean, or by programmatic lookup through the bean manager.
  */
 @Templated(value = "contact-page.html#contact", stylesheet = "contact-page.css")
-public class ContactDisplay extends ContactPresenter {
+public class ContactDisplay extends ContactPresenter implements IsElement {
 
   /**
    * This element is the root element of this component (as declared in the {@code #contact} fragment of the
@@ -145,7 +146,8 @@ public class ContactDisplay extends ContactPresenter {
     }
   }
 
-  public Element getRoot() {
+  @Override
+  public Element getElement() {
     return contact;
   }
 

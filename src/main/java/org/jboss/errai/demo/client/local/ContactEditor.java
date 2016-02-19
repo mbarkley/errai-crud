@@ -31,7 +31,7 @@ import com.google.gwt.dom.client.TextAreaElement;
 /**
  * <p>
  * An Errai UI component for creating and editing a single {@link Contact}. This component can be bound to a
- * {@link Contact} by calling {@link #setModel(Contact)}. It can also copy the state of a {@link Contact} without
+ * {@link Contact} by calling {@link #setValue(Contact)}. It can also copy the state of a {@link Contact} without
  * binding to it (and then later overwrite the state of the copied {@link Contact}).
  *
  * <p>
@@ -99,7 +99,7 @@ public class ContactEditor extends ContactPresenter {
    * Sets the given model as the model for this component but pauses data-binding. Any changes made to the UI or model
    * will not be synchronized until {@link #syncStateFromUI()} is called.
    */
-  public void setModelPaused(final Contact model) {
+  public void setValuePaused(final Contact model) {
     binder.setModel(model, StateSync.FROM_MODEL);
     binder.pause();
   }
