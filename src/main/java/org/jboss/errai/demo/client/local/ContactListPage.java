@@ -28,6 +28,10 @@ import javax.inject.Inject;
 
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.dom.HTMLButtonElement;
+import org.jboss.errai.common.client.dom.HTMLDivElement;
+import org.jboss.errai.common.client.dom.Node;
+import org.jboss.errai.common.client.dom.NodeList;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
@@ -47,9 +51,6 @@ import org.jboss.errai.ui.shared.api.annotations.SinkNative;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 import org.slf4j.Logger;
 
-import com.google.gwt.dom.client.ButtonElement;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Event;
@@ -102,7 +103,7 @@ public class ContactListPage {
 
   @Inject
   @DataField
-  private DivElement modal;
+  private HTMLDivElement modal;
 
   @Inject
   @DataField("modal-content")
@@ -110,7 +111,7 @@ public class ContactListPage {
 
   @Inject
   @DataField("modal-delete")
-  private ButtonElement delete;
+  private HTMLButtonElement delete;
 
   /**
    * This is a simple interface for calling a remote HTTP service. Behind this interface, Errai has generated an HTTP
@@ -135,8 +136,16 @@ public class ContactListPage {
      * all retrieved contacts.
      */
     contactService.call((List<Contact> contacts) -> binder.getModel().addAll(contacts)).getAllContacts();
+
     // Remove placeholder table row from template.
-    list.getElement().removeAllChildren();
+    final NodeList children = list.getElement().getChildNodes();
+    for (int i = 0; i < children.getLength(); i++) {
+      final Node child = children.item(i);
+      if (child.getNodeType() == Node.ELEMENT_NODE) {
+        list.getElement().removeChild(child);
+      }
+    }
+
     list.setSelector(display -> display.setSelected(true));
     list.setDeselector(display -> display.setSelected(false));
   }
@@ -319,11 +328,11 @@ public class ContactListPage {
    */
   private void displayModal(final boolean showDelete) {
     if (showDelete) {
-      delete.getStyle().clearDisplay();
+      delete.getStyle().removeProperty("display");
     } else {
-      delete.getStyle().setDisplay(Display.NONE);
+      delete.getStyle().setProperty("display", "none", "");
     }
-    modal.getStyle().setDisplay(Display.BLOCK);
+    modal.getStyle().setProperty("display", "block", "");
   }
 
   private void editModel(final Contact model) {
@@ -336,6 +345,6 @@ public class ContactListPage {
   }
 
   private void hideModal() {
-    modal.getStyle().clearDisplay();
+    modal.getStyle().removeProperty("display");
   }
 }

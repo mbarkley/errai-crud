@@ -21,23 +21,22 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.jboss.errai.common.client.api.IsElement;
+import org.jboss.errai.common.client.dom.HTMLElement;
+import org.jboss.errai.common.client.dom.HTMLTableCellElement;
+import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
-import org.jboss.errai.ui.client.widget.ListWidget;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.EventHandler;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
 
-import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.TableCellElement;
-import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 
 /**
  * <p>
  * An Errai UI component for displaying a single {@link Contact} as a row in an HTML table. Can be used to display
- * {@link Contact Contacts} in a {@link ListWidget}. This component can be bound to a {@link Contact} by calling
+ * {@link Contact Contacts} in a {@link ListComponent}. This component can be bound to a {@link Contact} by calling
  * {@link #setValue(Contact)}.
  *
  * <p>
@@ -69,9 +68,9 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
    * This element is the root element of this component (as declared in the {@code #contact} fragment of the
    * {@link Templated#value()} above).
    */
-  @Inject
+  @Inject @Named("tr")
   @DataField
-  private TableRowElement contact;
+  private HTMLTableCellElement contact;
 
   /*
    * The TableCellElements are injected with the @Named("td") qualifier to remove ambiguity between the possible tag
@@ -80,30 +79,30 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
 
   @Inject @Named("td")
   @Bound @DataField
-  private TableCellElement fullname;
+  private HTMLTableCellElement fullname;
 
   @Inject @Named("td")
   @Bound @DataField
-  private TableCellElement nickname;
+  private HTMLTableCellElement nickname;
 
   @Inject @Named("td")
   @Bound @DataField
-  private TableCellElement phonenumber;
+  private HTMLTableCellElement phonenumber;
 
   @Inject @Named("td")
   @Bound @DataField
-  private TableCellElement email;
+  private HTMLTableCellElement email;
 
   /*
    * We specify a converter because Errai does not provide built-in conversion from String to Date.
    */
   @Inject @Named("td")
   @Bound(converter = DateConverter.class) @DataField
-  private TableCellElement birthday;
+  private HTMLTableCellElement birthday;
 
   @Inject @Named("td")
   @Bound @DataField
-  private TableCellElement notes;
+  private HTMLTableCellElement notes;
 
   @Inject
   @Click
@@ -140,14 +139,18 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
    */
   public void setSelected(final boolean selected) {
     if (selected) {
-      contact.addClassName("selected");
+      if (!contact.getClassName().contains("selected")) {
+        contact.setClassName((contact.getClassName() + " selected").trim());
+      }
     } else {
-      contact.removeClassName("selected");
+      if (contact.getClassName().contains("selected")) {
+        contact.setClassName(contact.getClassName().replace("selected", "").trim());
+      }
     }
   }
 
   @Override
-  public Element getElement() {
+  public HTMLElement getElement() {
     return contact;
   }
 

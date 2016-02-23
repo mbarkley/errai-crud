@@ -18,15 +18,17 @@ package org.jboss.errai.demo.client.local;
 
 import javax.inject.Inject;
 
+import org.jboss.errai.common.client.api.IsElement;
+import org.jboss.errai.common.client.dom.DateInputElement;
+import org.jboss.errai.common.client.dom.HTMLDivElement;
+import org.jboss.errai.common.client.dom.HTMLElement;
+import org.jboss.errai.common.client.dom.HTMLTextAreaElement;
+import org.jboss.errai.common.client.dom.TextInputElement;
 import org.jboss.errai.databinding.client.api.StateSync;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
 import org.jboss.errai.ui.shared.api.annotations.Templated;
-
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.InputElement;
-import com.google.gwt.dom.client.TextAreaElement;
 
 /**
  * <p>
@@ -53,47 +55,43 @@ import com.google.gwt.dom.client.TextAreaElement;
  * bean, or by programmatic lookup through the bean manager.
  */
 @Templated(value = "contact-page.html#modal-content", stylesheet = "contact-page.css")
-public class ContactEditor extends ContactPresenter {
+public class ContactEditor extends ContactPresenter implements IsElement {
 
   /**
-   * The {@link DataField} annotation for this field declares that this {@link DivElement} is the element from the
+   * The {@link DataField} annotation for this field declares that this {@link HTMLDivElement} is the element from the
    * template file with the CSS class {@code modal-content}. Because of the fragment {@code #modal-content} in the
    * {@link Templated#value()} on this class, this is the root element of this template.
    */
   @Inject
   @DataField("modal-content")
-  private DivElement root;
+  private HTMLDivElement root;
 
   @Inject
   @Bound @DataField
-  private InputElement fullname;
+  private TextInputElement fullname;
 
   @Inject
   @Bound @DataField
-  private InputElement nickname;
+  private TextInputElement nickname;
 
   @Inject
   @Bound @DataField
-  private InputElement phonenumber;
+  private TextInputElement phonenumber;
 
   @Inject
   @Bound @DataField
-  private InputElement email;
+  private TextInputElement email;
 
   @Inject
   @Bound @DataField
-  private TextAreaElement notes;
+  private HTMLTextAreaElement notes;
 
   /*
    * We specify a converter because Errai does not provide built-in conversion from String to Date.
    */
   @Inject
   @Bound(converter = DateConverter.class) @DataField
-  private InputElement birthday;
-
-  public DivElement getRootElement() {
-    return root;
-  }
+  private DateInputElement birthday;
 
   /**
    * Sets the given model as the model for this component but pauses data-binding. Any changes made to the UI or model
@@ -110,6 +108,11 @@ public class ContactEditor extends ContactPresenter {
   public void syncStateFromUI() {
     // Does nothing if already resumed.
     binder.resume(StateSync.FROM_UI);
+  }
+
+  @Override
+  public HTMLElement getElement() {
+    return root;
   }
 
 }
