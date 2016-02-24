@@ -88,6 +88,7 @@ button.new-contact {
   width: 100%;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+  margin: 0;
 }
 
 .contact {
@@ -144,5 +145,27 @@ button.new-contact {
   left: 0;
   right: 0;
   background-color: grey;
+  color: black;
+}
+
+.header {
+  text-align: center;
+  background-color: rgb(40,40,40);
+  color: rgb(220,220,220);
+  padding: 0;
+  font-size: 20px;
+  border-radius: 5px;
+}
+
+.header > h1 {
+  font-size: 60px;
+  color: white;
+}
+
+.header img {
+  height: 100px;
+}
+
+.header button {
   color: black;
 }
