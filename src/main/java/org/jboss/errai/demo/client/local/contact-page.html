@@ -5,51 +5,72 @@
  -->
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="../../../../../../../webapp/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="../../../../../../../webapp/bootstrap/css/bootstrap-responsive.css">
+    <link rel="stylesheet" type="text/css" href="../../../../../../../webapp/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="contact-page.css">
     <link rel="stylesheet" type="text/css" href="../../../../../../../webapp/css/application.css">
-    <script src="../../../../../../../webapp/bootstrap/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="../../../../../../../webapp/css/shop-homepage.css">
+    <script src="../../../../../../../webapp/js/jquery.js"></script>
+    <script src="../../../../../../../webapp/js/bootstrap.js"></script>
   </head>
   <body>
-    <div id="contact-list" class="container">
-      <div class="modal">
-        <div class="modal-content">
-          <input class="nickname" type="text" placeholder="Nickname">
-          <input class="fullname" type="text" placeholder="Full Name">
-          <input class="phonenumber" type="tel" placeholder="1 234 567 8910">
-          <input class="email" type="email" placeholder="email@domain.tld">
-          <input class="birthday" type="date" placeholder="2016-01-01">
-          <textarea class="notes" rows="4" cols="100" placeholder="I met so-and-so at..."></textarea>
+    <div class="container">
+      <div id="contact-list" class="row">
+
+        <!-- START Modal Form -->
+        <div class="modal container">
+          <div class="modal-content row">
+
+            <div data-field="modal-fields" class="row modal-fields">
+              <input data-field="nickname" class="nickname col-md-10 col-md-offset-1" type="text" placeholder="Nickname">
+              <input data-field="nickname" class="fullname col-md-10 col-md-offset-1" type="text" placeholder="Full Name">
+              <input data-field="nickname" class="phonenumber col-md-10 col-md-offset-1" type="tel" placeholder="1 234 567 8910">
+              <input data-field="nickname" class="email col-md-10 col-md-offset-1" type="email" placeholder="email@domain.tld">
+              <input data-field="nickname" class="birthday col-md-10 col-md-offset-1" type="date" placeholder="2016-01-01">
+              <textarea data-field="nickname" class="notes col-md-10 col-md-offset-1" rows="4" cols="100" placeholder="I met so-and-so at..."></textarea>
+            </div>
+
+            <div class="button-row row">
+              <div class="col-md-4">
+                <button class="modal-button modal-submit">Submit</button>
+              </div>
+              <div class="col-md-4">
+                <button class="modal-button modal-cancel">Cancel</button>
+              </div>
+              <div class="col-md-4">
+                <button class="modal-button modal-delete">Delete</button>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <button class="modal-button modal-submit">Submit</button>
-        <button class="modal-button modal-cancel">Cancel</button>
-        <button class="modal-button modal-delete">Delete</button>
-      </div>
-      <div class="container table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Nickname</th>
-              <th>Fullname</th>
-              <th>Phonenumber</th>
-              <th>Email</th>
-              <th>Birthday</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody data-field="list">
-            <tr class="contact">
-              <td class="nickname">Nickname</td>
-              <td class="fullname">Full Name</td>
-              <td class="phonenumber">1 234 567 8910</td>
-              <td class="email">email@domain.tld</td>
-              <td class="birthday">2016-01-01</td>
-              <td class="notes">I met so-and-so at...</td>
-            </tr>
-          </tbody>
-        </table>
-        <button class="new-contact">+</button>
+        <!-- END Modal Form -->
+
+        <div class="col-md-12">
+          <div class="row header">
+            <div class="col-md-12">
+              <img class="slide-image" src="http://placehold.it/800x300" alt="">
+            </div>
+            <div class="col-md-12">
+              <button class="new-contact">New Contact</button>
+            </div>
+          </div>
+
+          <div class="row" data-field="list">
+            <div data-field="contact" class="contact col-sm-4 col-lg-4 col-md-4">
+              <div class="thumbnail">
+                <img src="http://placehold.it/320x150" alt="">
+                <div class="caption">
+                  <h4 class="nickname">First Product</h4>
+                  <div class="fullname">Full Name</div>
+                  <div class="phonenumber">1 234 567 8910</div>
+                  <div class="email">email@domain.tld</div>
+                  <div class="birthday">2016-01-01</div>
+                  <div class="notes">I met so-and-so at...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </body>

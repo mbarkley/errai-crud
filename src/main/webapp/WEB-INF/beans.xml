@@ -5,6 +5,7 @@
     <!-- These exclusions were added by Errai to avoid deploying client-side classes to the server -->
     <exclude name = "org.jboss.errai.demo.client.local.DoubleClick" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactEditor" />
+    <exclude name = "org.jboss.errai.demo.client.local.AppSetup" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactPresenter" />
     <exclude name = "org.jboss.errai.demo.client.local.DateConverter" />
     <exclude name = "org.jboss.errai.demo.client.local.ContactDisplay" />

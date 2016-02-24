@@ -99,14 +99,14 @@ public class ContactListPage {
   private ListComponent<Contact, ContactDisplay> list = forIsElementComponent(
                                                           () -> displayFactory.get(),
                                                           display -> displayFactory.destroy(display))
-                                                        .inTBody();
+                                                        .inDiv();
 
   @Inject
   @DataField
   private HTMLDivElement modal;
 
   @Inject
-  @DataField("modal-content")
+  @DataField("modal-fields")
   private ContactEditor editor;
 
   @Inject
@@ -311,8 +311,13 @@ public class ContactListPage {
    * {@link ContactDisplay} when it is clicked.
    */
   public void selectComponent(final @Observes @Click ContactDisplay component) {
-    list.deselectAll();
-    list.selectComponent(component);
+    if (list.getSelectedComponents().contains(component)) {
+      list.deselectAll();
+    }
+    else {
+      list.deselectAll();
+      list.selectComponent(component);
+    }
   }
 
   /**
@@ -332,7 +337,9 @@ public class ContactListPage {
     } else {
       delete.getStyle().setProperty("display", "none", "");
     }
-    modal.getStyle().setProperty("display", "block", "");
+    if (!modal.getClassName().contains("displayed")) {
+      modal.setClassName(modal.getClassName().concat(" displayed").trim());
+    }
   }
 
   private void editModel(final Contact model) {
@@ -345,6 +352,6 @@ public class ContactListPage {
   }
 
   private void hideModal() {
-    modal.getStyle().removeProperty("display");
+    modal.setClassName(modal.getClassName().replace("displayed", "").trim());
   }
 }

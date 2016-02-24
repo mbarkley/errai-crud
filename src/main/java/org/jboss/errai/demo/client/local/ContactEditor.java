@@ -54,7 +54,7 @@ import org.jboss.errai.ui.shared.api.annotations.Templated;
  * Instances of this type should be obtained via Errai IoC, either by using {@link Inject} in another container managed
  * bean, or by programmatic lookup through the bean manager.
  */
-@Templated(value = "contact-page.html#modal-content", stylesheet = "contact-page.css")
+@Templated(value = "contact-page.html#modal-fields", stylesheet = "contact-page.css")
 public class ContactEditor extends ContactPresenter implements IsElement {
 
   /**
@@ -63,7 +63,7 @@ public class ContactEditor extends ContactPresenter implements IsElement {
    * {@link Templated#value()} on this class, this is the root element of this template.
    */
   @Inject
-  @DataField("modal-content")
+  @DataField("modal-fields")
   private HTMLDivElement root;
 
   @Inject

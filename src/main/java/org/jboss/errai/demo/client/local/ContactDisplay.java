@@ -16,13 +16,15 @@
 
 package org.jboss.errai.demo.client.local;
 
+import static org.jboss.errai.common.client.dom.Window.getDocument;
+
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.jboss.errai.common.client.api.IsElement;
+import org.jboss.errai.common.client.dom.Element;
+import org.jboss.errai.common.client.dom.HTMLDivElement;
 import org.jboss.errai.common.client.dom.HTMLElement;
-import org.jboss.errai.common.client.dom.HTMLTableCellElement;
 import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
@@ -68,41 +70,35 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
    * This element is the root element of this component (as declared in the {@code #contact} fragment of the
    * {@link Templated#value()} above).
    */
-  @Inject @Named("tr")
+  @Inject
   @DataField
-  private HTMLTableCellElement contact;
+  private HTMLDivElement contact;
 
-  /*
-   * The TableCellElements are injected with the @Named("td") qualifier to remove ambiguity between the possible tag
-   * names "td" and "th".
-   */
-
-  @Inject @Named("td")
+  @Inject
   @Bound @DataField
-  private HTMLTableCellElement fullname;
+  private HTMLDivElement fullname;
 
-  @Inject @Named("td")
   @Bound @DataField
-  private HTMLTableCellElement nickname;
+  private Element nickname = getDocument().createElement("h4");
 
-  @Inject @Named("td")
+  @Inject
   @Bound @DataField
-  private HTMLTableCellElement phonenumber;
+  private HTMLDivElement phonenumber;
 
-  @Inject @Named("td")
+  @Inject
   @Bound @DataField
-  private HTMLTableCellElement email;
+  private HTMLDivElement email;
 
   /*
    * We specify a converter because Errai does not provide built-in conversion from String to Date.
    */
-  @Inject @Named("td")
+  @Inject
   @Bound(converter = DateConverter.class) @DataField
-  private HTMLTableCellElement birthday;
+  private HTMLDivElement birthday;
 
-  @Inject @Named("td")
+  @Inject
   @Bound @DataField
-  private HTMLTableCellElement notes;
+  private HTMLDivElement notes;
 
   @Inject
   @Click
