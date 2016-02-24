@@ -16,8 +16,10 @@
 
 package org.jboss.errai.demo.client.local;
 
+import static org.jboss.errai.common.client.dom.Window.getDocument;
 import static org.jboss.errai.databinding.client.components.ListComponent.forIsElementComponent;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,9 +32,12 @@ import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.dom.HTMLButtonElement;
 import org.jboss.errai.common.client.dom.HTMLDivElement;
+import org.jboss.errai.common.client.dom.HTMLElement;
 import org.jboss.errai.common.client.dom.Node;
 import org.jboss.errai.common.client.dom.NodeList;
+import org.jboss.errai.common.client.function.Function;
 import org.jboss.errai.databinding.client.api.DataBinder;
+import org.jboss.errai.databinding.client.api.StateSync;
 import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
@@ -43,6 +48,8 @@ import org.jboss.errai.demo.client.shared.Updated;
 import org.jboss.errai.enterprise.client.jaxrs.api.ResponseCallback;
 import org.jboss.errai.ui.nav.client.local.DefaultPage;
 import org.jboss.errai.ui.nav.client.local.Page;
+import org.jboss.errai.ui.nav.client.local.PageHiding;
+import org.jboss.errai.ui.nav.client.local.PageShown;
 import org.jboss.errai.ui.shared.api.annotations.AutoBound;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
@@ -113,6 +120,12 @@ public class ContactListPage {
   @DataField("modal-delete")
   private HTMLButtonElement delete;
 
+  @Inject
+  private NavBar navbar;
+
+  private HTMLElement newContactAnchor = (HTMLElement) getDocument().createElement("a");
+  private HTMLElement sortContactsAnchor = (HTMLElement) getDocument().createElement("a");
+
   /**
    * This is a simple interface for calling a remote HTTP service. Behind this interface, Errai has generated an HTTP
    * request to the service defined by {@link ContactStorageService} (a JaxRS service).
@@ -148,6 +161,26 @@ public class ContactListPage {
 
     list.setSelector(display -> display.setSelected(true));
     list.setDeselector(display -> display.setSelected(false));
+
+    newContactAnchor.setAttribute("href", "javascript:");
+    newContactAnchor.setInnerHTML("Create Contact");
+    newContactAnchor.setOnclick(e -> displayFormWithNewContact());
+
+    sortContactsAnchor.setAttribute("href", "javascript:");
+    sortContactsAnchor.setInnerHTML("Sort By Nickname");
+    sortContactsAnchor.setOnclick(e -> sortContactsByName());
+  }
+
+  @PageShown
+  public void addNavBarButtons() {
+    navbar.add(newContactAnchor);
+    navbar.add(sortContactsAnchor);
+  }
+
+  @PageHiding
+  public void removeNavBarButtons() {
+    navbar.remove(newContactAnchor);
+    navbar.remove(sortContactsAnchor);
   }
 
   /**
@@ -205,6 +238,10 @@ public class ContactListPage {
   @SinkNative(Event.ONCLICK)
   @EventHandler("new-contact")
   public void onNewContactClick(final Event event) {
+    displayFormWithNewContact();
+  }
+
+  private void displayFormWithNewContact() {
     editor.setValue(new Contact());
     displayModal(false);
   }
@@ -353,5 +390,14 @@ public class ContactListPage {
 
   private void hideModal() {
     modal.setClassName(modal.getClassName().replace("displayed", "").trim());
+  }
+
+  private void sortContactsByName() {
+    binder.pause();
+    final Function<Contact, String> nickGetter = c -> (c.getNickname() == null ? "" : c.getNickname());
+    Collections.sort(binder.getModel(), (a,b) -> {
+      return nickGetter.apply(a).compareTo(nickGetter.apply(b));
+    });
+    binder.resume(StateSync.FROM_MODEL);
   }
 }

@@ -16,9 +16,13 @@
 
 package org.jboss.errai.demo.client.local;
 
+import static org.jboss.errai.common.client.dom.Window.getDocument;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import org.jboss.errai.common.client.dom.Node;
+import org.jboss.errai.common.client.dom.NodeList;
 import org.jboss.errai.ioc.client.api.EntryPoint;
 import org.jboss.errai.ui.nav.client.local.NavigationPanel;
 
@@ -33,9 +37,23 @@ public class AppSetup {
   @Inject
   private NavigationPanel navPanel;
 
+  @Inject
+  private NavBar navbar;
+
   @PostConstruct
   public void init() {
     RootPanel.get("rootPanel").add(navPanel);
+    final Node body = getDocument().getElementsByTagName("body").item(0);
+    final NodeList children = body.getChildNodes();
+    Node before = null;
+    for (int i = 0; i < children.getLength(); i++) {
+      if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+        before = children.item(i);
+        break;
+      }
+    }
+
+    body.insertBefore(navbar.getElement(), before);
   }
 
 }
