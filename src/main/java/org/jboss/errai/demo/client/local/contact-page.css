@@ -54,6 +54,11 @@
   color: rgb(40, 40, 40);
 }
 
+.row.button-row {
+  margin-left: -1px;
+  margin-right: -1px;
+}
+
 .button-row > div {
   padding: 0;
 }
