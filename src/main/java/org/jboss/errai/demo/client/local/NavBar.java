@@ -20,11 +20,11 @@ import static org.jboss.errai.common.client.dom.Window.getDocument;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.jboss.errai.common.client.api.IsElement;
 import org.jboss.errai.common.client.dom.HTMLElement;
-import org.jboss.errai.common.client.dom.HTMLLIElement;
-import org.jboss.errai.common.client.dom.HTMLULListElement;
+import org.jboss.errai.common.client.dom.HTMLUListElement;
 import org.jboss.errai.common.client.dom.Node;
 import org.jboss.errai.common.client.function.Optional;
 import org.jboss.errai.ui.shared.api.annotations.DataField;
@@ -37,12 +37,13 @@ import org.jboss.errai.ui.shared.api.annotations.Templated;
 @Templated("contact-page.html#navbar")
 public class NavBar implements IsElement {
 
+  @Inject @Named("nav")
   @DataField
-  private HTMLElement navbar = (HTMLElement) getDocument().createElement("nav");
+  private HTMLElement navbar;
 
   @Inject
   @DataField
-  private HTMLULListElement navlist;
+  private HTMLUListElement navlist;
 
   @Override
   public HTMLElement getElement() {
@@ -50,7 +51,7 @@ public class NavBar implements IsElement {
   }
 
   public void add(final HTMLElement element) {
-    final HTMLLIElement li = (HTMLLIElement) getDocument().createElement("li");
+    final HTMLElement li = getDocument().createElement("li");
     li.appendChild(element);
     navlist.appendChild(li);
   }

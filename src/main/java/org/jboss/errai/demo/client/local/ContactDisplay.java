@@ -16,15 +16,15 @@
 
 package org.jboss.errai.demo.client.local;
 
-import static org.jboss.errai.common.client.dom.Window.getDocument;
-
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.jboss.errai.common.client.api.IsElement;
-import org.jboss.errai.common.client.dom.Element;
+import org.jboss.errai.common.client.dom.DOMUtil;
 import org.jboss.errai.common.client.dom.HTMLDivElement;
 import org.jboss.errai.common.client.dom.HTMLElement;
+import org.jboss.errai.common.client.dom.HTMLHeadingElement;
 import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
@@ -78,8 +78,9 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
   @Bound @DataField
   private HTMLDivElement fullname;
 
+  @Inject @Named("h4")
   @Bound @DataField
-  private Element nickname = getDocument().createElement("h4");
+  private HTMLHeadingElement nickname;
 
   @Inject
   @Bound @DataField
@@ -135,13 +136,9 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
    */
   public void setSelected(final boolean selected) {
     if (selected) {
-      if (!contact.getClassName().contains("selected")) {
-        contact.setClassName((contact.getClassName() + " selected").trim());
-      }
+      DOMUtil.addCSSClass(contact, "selected");
     } else {
-      if (contact.getClassName().contains("selected")) {
-        contact.setClassName(contact.getClassName().replace("selected", "").trim());
-      }
+      DOMUtil.removeCSSClass(contact, "selected");
     }
   }
 

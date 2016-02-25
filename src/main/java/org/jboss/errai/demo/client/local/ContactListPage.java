@@ -16,25 +16,20 @@
 
 package org.jboss.errai.demo.client.local;
 
-import static org.jboss.errai.common.client.dom.Window.getDocument;
-import static org.jboss.errai.databinding.client.components.ListComponent.forIsElementComponent;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
+import org.jboss.errai.common.client.dom.DOMUtil;
+import org.jboss.errai.common.client.dom.HTMLAnchorElement;
 import org.jboss.errai.common.client.dom.HTMLButtonElement;
 import org.jboss.errai.common.client.dom.HTMLDivElement;
-import org.jboss.errai.common.client.dom.HTMLElement;
-import org.jboss.errai.common.client.dom.Node;
-import org.jboss.errai.common.client.dom.NodeList;
 import org.jboss.errai.common.client.function.Function;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.databinding.client.api.StateSync;
@@ -97,16 +92,11 @@ public class ContactListPage {
   @AutoBound
   private DataBinder<List<Contact>> binder;
 
-  @Inject
-  private Instance<ContactDisplay> displayFactory;
-
   /* By binding to "this", the ContactList is kept in sync with the list from binder. */
+  @Inject
   @Bound(property="this")
   @DataField
-  private ListComponent<Contact, ContactDisplay> list = forIsElementComponent(
-                                                          () -> displayFactory.get(),
-                                                          display -> displayFactory.destroy(display))
-                                                        .inDiv();
+  private ListComponent<Contact, ContactDisplay> list;
 
   @Inject
   @DataField
@@ -123,8 +113,11 @@ public class ContactListPage {
   @Inject
   private NavBar navbar;
 
-  private HTMLElement newContactAnchor = (HTMLElement) getDocument().createElement("a");
-  private HTMLElement sortContactsAnchor = (HTMLElement) getDocument().createElement("a");
+  @Inject
+  private HTMLAnchorElement newContactAnchor;
+
+  @Inject
+  private HTMLAnchorElement sortContactsAnchor;
 
   /**
    * This is a simple interface for calling a remote HTTP service. Behind this interface, Errai has generated an HTTP
@@ -151,23 +144,17 @@ public class ContactListPage {
     contactService.call((List<Contact> contacts) -> binder.getModel().addAll(contacts)).getAllContacts();
 
     // Remove placeholder table row from template.
-    final NodeList children = list.getElement().getChildNodes();
-    for (int i = 0; i < children.getLength(); i++) {
-      final Node child = children.item(i);
-      if (child.getNodeType() == Node.ELEMENT_NODE) {
-        list.getElement().removeChild(child);
-      }
-    }
+    DOMUtil.removeAllElementChildren(list.getElement());
 
     list.setSelector(display -> display.setSelected(true));
     list.setDeselector(display -> display.setSelected(false));
 
-    newContactAnchor.setAttribute("href", "javascript:");
-    newContactAnchor.setInnerHTML("Create Contact");
+    newContactAnchor.setHref("javascript:");
+    newContactAnchor.setTextContent("Create Contact");
     newContactAnchor.setOnclick(e -> displayFormWithNewContact());
 
-    sortContactsAnchor.setAttribute("href", "javascript:");
-    sortContactsAnchor.setInnerHTML("Sort By Nickname");
+    sortContactsAnchor.setHref("javascript:");
+    sortContactsAnchor.setTextContent("Sort By Nickname");
     sortContactsAnchor.setOnclick(e -> sortContactsByName());
   }
 
@@ -260,7 +247,7 @@ public class ContactListPage {
   @SinkNative(Event.ONCLICK)
   @EventHandler("modal-submit")
   public void onModalSubmitClick(final Event event) {
-    hideModal();
+    DOMUtil.removeCSSClass(modal, "displayed");
     if (binder.getModel().contains(editor.getValue())) {
       updateContactFromEditor();
     }
@@ -306,7 +293,7 @@ public class ContactListPage {
   @SinkNative(Event.ONCLICK)
   @EventHandler("modal-cancel")
   public void onModalCancelClick(final Event event) {
-    hideModal();
+    DOMUtil.removeCSSClass(modal, "displayed");
   }
 
   /**
@@ -329,7 +316,7 @@ public class ContactListPage {
         }
       }).delete(editor.getValue().getId());
       editor.setValue(new Contact());
-      hideModal();
+      DOMUtil.removeCSSClass(modal, "displayed");
     }
   }
 
@@ -372,11 +359,9 @@ public class ContactListPage {
     if (showDelete) {
       delete.getStyle().removeProperty("display");
     } else {
-      delete.getStyle().setProperty("display", "none", "");
+      delete.getStyle().setProperty("display", "none");
     }
-    if (!modal.getClassName().contains("displayed")) {
-      modal.setClassName(modal.getClassName().concat(" displayed").trim());
-    }
+    DOMUtil.addCSSClass(modal, "displayed");
   }
 
   private void editModel(final Contact model) {
@@ -386,10 +371,6 @@ public class ContactListPage {
      */
     editor.setValuePaused(model);
     displayModal(true);
-  }
-
-  private void hideModal() {
-    modal.setClassName(modal.getClassName().replace("displayed", "").trim());
   }
 
   private void sortContactsByName() {
