@@ -16,6 +16,10 @@
 
 package org.jboss.errai.demo.server;
 
+import static org.jboss.errai.demo.client.shared.Operation.OperationType.CREATE;
+import static org.jboss.errai.demo.client.shared.Operation.OperationType.DELETE;
+import static org.jboss.errai.demo.client.shared.Operation.OperationType.UPDATE;
+
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -27,9 +31,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
-import org.jboss.errai.demo.client.shared.Created;
-import org.jboss.errai.demo.client.shared.Deleted;
-import org.jboss.errai.demo.client.shared.Updated;
+import org.jboss.errai.demo.client.shared.Operation;
 
 /**
  * Server-side implementation for the RPC service, {@link ContactStorageService}. Performs database CRUD operations
@@ -43,15 +45,15 @@ public class ContactStorageServiceImpl implements ContactStorageService {
   private ContactEntityService entityService;
 
   @Inject
-  @Created
+  @Operation(CREATE)
   private Event<ContactOperation> created;
 
   @Inject
-  @Updated
+  @Operation(UPDATE)
   private Event<ContactOperation> updated;
 
   @Inject
-  @Deleted
+  @Operation(DELETE)
   private Event<Long> deleted;
 
   @Override

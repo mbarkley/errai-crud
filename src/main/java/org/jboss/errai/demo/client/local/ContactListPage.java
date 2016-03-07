@@ -16,6 +16,10 @@
 
 package org.jboss.errai.demo.client.local;
 
+import static org.jboss.errai.demo.client.shared.Operation.OperationType.CREATE;
+import static org.jboss.errai.demo.client.shared.Operation.OperationType.DELETE;
+import static org.jboss.errai.demo.client.shared.Operation.OperationType.UPDATE;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -37,9 +41,7 @@ import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.demo.client.shared.ContactOperation;
 import org.jboss.errai.demo.client.shared.ContactStorageService;
-import org.jboss.errai.demo.client.shared.Created;
-import org.jboss.errai.demo.client.shared.Deleted;
-import org.jboss.errai.demo.client.shared.Updated;
+import org.jboss.errai.demo.client.shared.Operation;
 import org.jboss.errai.enterprise.client.jaxrs.api.ResponseCallback;
 import org.jboss.errai.ui.nav.client.local.DefaultPage;
 import org.jboss.errai.ui.nav.client.local.Page;
@@ -174,7 +176,7 @@ public class ContactListPage {
    * This is called in response to Errai CDI {@link javax.enterprise.event.Event Events} fired from the server when a
    * new {@link Contact} is created. In this way we can display newly created contacts from other browser sessions.
    */
-  public void onRemoteCreated(final @Observes @Created ContactOperation contactOperation) {
+  public void onRemoteCreated(final @Observes @Operation(CREATE) ContactOperation contactOperation) {
     if (sourceIsNotThisClient(contactOperation)) {
       binder.getModel().add(contactOperation.getContact());
     }
@@ -185,7 +187,7 @@ public class ContactListPage {
    * existing {@link Contact} is updated. In this way we can display new property values for contacts when they are
    * updated from other browser sessions.
    */
-  public void onRemoteUpdated(final @Observes @Updated ContactOperation contactOperation) {
+  public void onRemoteUpdated(final @Observes @Operation(UPDATE) ContactOperation contactOperation) {
     if (sourceIsNotThisClient(contactOperation)) {
       final int indexOf = binder.getModel().indexOf(contactOperation.getContact());
       if (indexOf == -1) {
@@ -202,7 +204,7 @@ public class ContactListPage {
    * existing {@link Contact} is deleted. In this way we can remove displayed contacts when they are deleted in other
    * browser sessions.
    */
-  public void onRemoteDelete(final @Observes @Deleted Long id) {
+  public void onRemoteDelete(final @Observes @Operation(DELETE) Long id) {
     final Iterator<Contact> contactIter = binder.getModel().iterator();
     while (contactIter.hasNext()) {
       if (id.equals(contactIter.next().getId())) {

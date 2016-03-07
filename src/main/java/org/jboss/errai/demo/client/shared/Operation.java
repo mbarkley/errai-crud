@@ -16,19 +16,24 @@
 
 package org.jboss.errai.demo.client.shared;
 
-import java.lang.annotation.Documented;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Qualifier;
 
 /**
- * Qualifier for {@link ContactOperation} to differentiate the updating of existing {@link Contact Contacts} from the
- * creation of new ones.
+ * Qualifier for {@link ContactOperation} to differentiate between creation, update, and deletion of {@link Contact
+ * Contacts}.
  */
+@Retention(RUNTIME)
 @Qualifier
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Updated {
+public @interface Operation {
+
+  public static enum OperationType {
+    CREATE, UPDATE, DELETE
+  }
+
+  OperationType value();
 
 }
