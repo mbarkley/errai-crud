@@ -31,9 +31,9 @@ import javax.inject.Inject;
 import org.jboss.errai.bus.client.api.ClientMessageBus;
 import org.jboss.errai.common.client.api.Caller;
 import org.jboss.errai.common.client.dom.DOMUtil;
-import org.jboss.errai.common.client.dom.HTMLAnchorElement;
-import org.jboss.errai.common.client.dom.HTMLButtonElement;
-import org.jboss.errai.common.client.dom.HTMLDivElement;
+import org.jboss.errai.common.client.dom.Anchor;
+import org.jboss.errai.common.client.dom.Button;
+import org.jboss.errai.common.client.dom.Div;
 import org.jboss.errai.common.client.function.Function;
 import org.jboss.errai.databinding.client.api.DataBinder;
 import org.jboss.errai.databinding.client.api.StateSync;
@@ -102,7 +102,7 @@ public class ContactListPage {
 
   @Inject
   @DataField
-  private HTMLDivElement modal;
+  private Div modal;
 
   @Inject
   @DataField("modal-fields")
@@ -110,16 +110,16 @@ public class ContactListPage {
 
   @Inject
   @DataField("modal-delete")
-  private HTMLButtonElement delete;
+  private Button delete;
 
   @Inject
   private NavBar navbar;
 
   @Inject
-  private HTMLAnchorElement newContactAnchor;
+  private Anchor newContactAnchor;
 
   @Inject
-  private HTMLAnchorElement sortContactsAnchor;
+  private Anchor sortContactsAnchor;
 
   /**
    * This is a simple interface for calling a remote HTTP service. Behind this interface, Errai has generated an HTTP

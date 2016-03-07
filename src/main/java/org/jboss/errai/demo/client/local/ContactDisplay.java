@@ -22,9 +22,9 @@ import javax.inject.Named;
 
 import org.jboss.errai.common.client.api.IsElement;
 import org.jboss.errai.common.client.dom.DOMUtil;
-import org.jboss.errai.common.client.dom.HTMLDivElement;
+import org.jboss.errai.common.client.dom.Div;
 import org.jboss.errai.common.client.dom.HTMLElement;
-import org.jboss.errai.common.client.dom.HTMLHeadingElement;
+import org.jboss.errai.common.client.dom.Heading;
 import org.jboss.errai.databinding.client.components.ListComponent;
 import org.jboss.errai.demo.client.shared.Contact;
 import org.jboss.errai.ui.shared.api.annotations.Bound;
@@ -72,34 +72,34 @@ public class ContactDisplay extends ContactPresenter implements IsElement {
    */
   @Inject
   @DataField
-  private HTMLDivElement contact;
+  private Div contact;
 
   @Inject
   @Bound @DataField
-  private HTMLDivElement fullname;
+  private Div fullname;
 
   @Inject @Named("h4")
   @Bound @DataField
-  private HTMLHeadingElement nickname;
+  private Heading nickname;
 
   @Inject
   @Bound @DataField
-  private HTMLDivElement phonenumber;
+  private Div phonenumber;
 
   @Inject
   @Bound @DataField
-  private HTMLDivElement email;
+  private Div email;
 
   /*
    * We specify a converter because Errai does not provide built-in conversion from String to Date.
    */
   @Inject
   @Bound(converter = DateConverter.class) @DataField
-  private HTMLDivElement birthday;
+  private Div birthday;
 
   @Inject
   @Bound @DataField
-  private HTMLDivElement notes;
+  private Div notes;
 
   @Inject
   @Click
