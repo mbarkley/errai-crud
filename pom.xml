@@ -12,7 +12,7 @@
 
   <properties>
     <errai.version>4.0.0-SNAPSHOT</errai.version>
-    <gwt.version>2.8.0-beta1</gwt.version>
+    <gwt.version>2.8.0-SNAPSHOT</gwt.version>
     <slf4j.version>1.5.11</slf4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javaee.version>1.0.2.Final</javaee.version>
@@ -60,8 +60,14 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.jboss.errai</groupId>
+      <artifactId>errai-cdi-jboss</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
+      <version>${gwt.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -93,11 +99,6 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.errai</groupId>
-      <artifactId>errai-cdi-jboss</artifactId>
     </dependency>
 
    <dependency>
@@ -238,6 +239,7 @@
             </goals>
             <configuration>
               <artifactItems>
+                <!-- Unpacks Wildfly without the wildfly-undertow jar -->
                 <artifactItem>
                   <groupId>org.wildfly</groupId>
                   <artifactId>wildfly-dist</artifactId>
@@ -245,8 +247,50 @@
                   <type>zip</type>
                   <overWrite>false</overWrite>
                   <outputDirectory>${project.build.directory}</outputDirectory>
+                  <excludes>**/org/wildfly/extension/undertow/main/wildfly-undertow-${as.version}.jar</excludes>
+                </artifactItem>
+                <!-- Unpack a replacement for ServletContainerInitializerDeploymentProcessor.class -->
+                <artifactItem>
+                  <groupId>org.jboss.errai</groupId>
+                  <artifactId>errai-cdi-jboss</artifactId>
+                  <version>4.0.0-SNAPSHOT</version>
+                  <type>jar</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/wildfly-undertow-${as.version}/</outputDirectory>
+                  <includes>**/ServletContainerInitializerDeploymentProcessor.class</includes>
+                </artifactItem>
+                <!-- Unpack everything but ServletContainerInitializerDeploymentProcessor.class from wildfly-undertow.jar -->
+                <artifactItem>
+                  <groupId>org.wildfly</groupId>
+                  <artifactId>wildfly-undertow</artifactId>
+                  <version>${as.version}</version>
+                  <type>jar</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/wildfly-undertow-${as.version}/</outputDirectory>
+                  <excludes>**/ServletContainerInitializerDeploymentProcessor.class</excludes>
                 </artifactItem>
               </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Builds replacement jar for wildfly-undertow that has replaced ServletContainerInitializerDeploymentProcessor.class -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <jar
+                  destfile="${project.build.directory}/wildfly-${as.version}/modules/system/layers/base/org/wildfly/extension/undertow/main/wildfly-undertow-${as.version}.jar"
+                  basedir="${project.build.directory}/wildfly-undertow-${as.version}"
+                  compress="false"
+                />
+              </tasks>
             </configuration>
           </execution>
         </executions>
